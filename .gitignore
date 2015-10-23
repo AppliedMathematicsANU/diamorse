@@ -1,0 +1,25 @@
+# Compiled Object files
+*.slo
+*.lo
+*.o
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+
+# Dependency files for make
+*.P
+
+# Other temporary file
+*.gch
+
+# Directory for playing around in
+tmp/
+
+# Directory for binaries
+bin/
