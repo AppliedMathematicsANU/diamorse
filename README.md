@@ -2,6 +2,32 @@
 
 Digital image analysis using discrete Morse theory and persistent homology.
 
+## Reference
+
+Delgado-Friedrichs, O., Robins, V., & Sheppard, A. (2015). Skeletonization and partitioning of digital images using discrete Morse theory. *Pattern Analysis and Machine Intelligence, IEEE Transactions on*, 37(3), 654-666.
+
+# Documentation
+
+Below is some minimal information that should help you get started. We plan to add more detail over time. Please contact us if you have any questions.
+
+## Installation
+
+In order to compile diamorse, you will need *git*, a C++ compiler, the *Boost* library, and a GNU-compatible *make*.
+
+* Clone this repository to your machine: `git clone https://github.com/AppliedMathematicsANU/diamorse.git`
+* Run `make main` to compile only the main analysis programs, or `make` to also compile some utility programs.
+* Run `make python` to compile the python wrappers.
+
+## File formats
+
+Diamorse expects volume data to be stored in the NetCDF version 3 format.
+
+(in progress...)
+
+## Usage
+
+(in progress...)
+
 # License
 
 The MIT License (MIT)
