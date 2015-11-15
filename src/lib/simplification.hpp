@@ -13,6 +13,7 @@
 #ifndef ANU_AM_DIAMORSE_SIMPLIFICATION_HPP
 #define ANU_AM_DIAMORSE_SIMPLIFICATION_HPP
 
+#include <iostream>
 #include <limits>
 #include <map>
 #include <set>

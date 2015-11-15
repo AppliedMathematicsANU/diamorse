@@ -260,9 +260,9 @@ void fillMorseVectorField(Complex const& source,
     Facets cofacets(source.xdim(), source.ydim(), source.zdim(), true);
     Vertices vertices(source.xdim(), source.ydim(), source.zdim());
 
-    for (int x = 0; x < source.xdim(); ++x)
-        for (int y = 0; y < source.ydim(); ++y)
-            for (int z = 0; z < source.zdim(); ++z)
+    for (size_t x = 0; x < source.xdim(); ++x)
+        for (size_t y = 0; y < source.ydim(); ++y)
+            for (size_t z = 0; z < source.zdim(); ++z)
                 processLowerStar(source.cellAt(x, y, z),
                                  scalars, outputField,
                                  cofacets, vertices);
