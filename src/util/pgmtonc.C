@@ -40,21 +40,31 @@ typedef struct ImageDescriptor {
 };
 
 
+void skipData(std::ifstream& instream, ImageDescriptor const& descriptor)
+{
+    size_t const pixelCount = descriptor.width * descriptor.height;
+    size_t const bytesPerPixel = descriptor.maxval > 255 ? 2 : 1;
+
+    instream.seekg(pixelCount * bytesPerPixel, instream.cur);
+}
+
+
 ImageDescriptor nextImage(std::ifstream& instream)
 {
     size_t const pos = instream.tellg();
 
     checkAndSkipMagicNumber(instream);
+
     size_t const width  = readNumber(instream, "width");
     size_t const height = readNumber(instream, "height");
     size_t const maxval = readNumber(instream, "maximum grayscale value");
 
-    size_t const bytesPerPixel = maxval > 255 ? 2 : 1;
+    ImageDescriptor const descriptor(width, height, maxval, pos);
 
     checkAndSkipWhitespaceChar(instream);
-    instream.seekg(width * height * bytesPerPixel, instream.cur);
+    skipData(instream, descriptor);
 
-    return ImageDescriptor(width, height, maxval, pos);
+    return descriptor;
 }
 
 
