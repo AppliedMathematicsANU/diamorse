@@ -45,14 +45,9 @@ ImageDescriptor nextImage(std::ifstream& instream)
     size_t const pos = instream.tellg();
 
     checkAndSkipMagicNumber(instream);
-    size_t const width  = readIntegerAfterWhiteSpace(instream);
-    size_t const width  = readIntegerAfterWhiteSpace(instream);
-    size_t const maxval = readIntegerAfterWhiteSpace(instream);
-
-    if (maxval < 1 or maxval > 65535)
-        throw std::runtime_error(
-            "maximum grayscale value must be between 1 and 65535"
-            );
+    size_t const width  = readNumber(instream, "width");
+    size_t const height = readNumber(instream, "height");
+    size_t const maxval = readNumber(instream, "maximum grayscale value");
 
     size_t const bytesPerPixel = maxval > 255 ? 2 : 1;
 
