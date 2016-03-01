@@ -91,10 +91,15 @@ size_t readNumber(std::ifstream& instream, std::string const varname)
     skipMandatoryWhiteSpace(instream);
 
     if (not isdigit(peekNextSignificantCharacter(instream)))
-        throw std::runtime_error("expected number for " + varname);
+        throw std::runtime_error("expected a number for " + varname);
 
     while (isdigit(peekNextSignificantCharacter(instream)))
         n = n * 10 + instream.get() - '0';
+
+    if (n < 1)
+        throw std::runtime_error(varname + " must be at least 1");
+    else if (n > 65535)
+        throw std::runtime_error(varname + " must be at most 65535");
 
     return n;
 }
@@ -140,7 +145,7 @@ bool haveMatchingParameters(
 
 int main(int argc, char* argv[])
 {
-    if (argc < 2)
+    if (argc < 3)
     {
         std::cerr << "Usage:" << argv[0] << " INPUT OUTPUT" << std::endl;
         return 1;
@@ -163,7 +168,32 @@ int main(int argc, char* argv[])
                 );
 
         images.push_back(img);
-
-        printf("%ld %ld %ld\n", img.width, img.height, img.maxval);
     }
+
+    if (images.size() == 0)
+        throw std::runtime_error("no images found");
+
+    size_t const xdim = images[0].width;
+    size_t const ydim = images[0].height;
+    size_t const zdim = images.size();
+
+    size_t  const m = xdim * ydim;
+    size_t  const n = zdim * m;
+    float_t const s = images[0].maxval / 2.0;
+
+    boost::shared_ptr<std::vector<float_t> > data(new std::vector<float_t>(n));
+    size_t k = 0;
+
+    for (size_t i = 0; i < images.size(); ++i)
+    {
+        instream.seekg(images[i].offset, instream.beg);
+
+        for (size_t j = 0; j < m; ++j)
+        {
+            data->at(k) = (float) instream.get() - s;
+            ++k;
+        }
+    }
+
+    writeVolumeData(data, outfile, "tomo_float", xdim, ydim, zdim);
 }
