@@ -52,7 +52,7 @@ void skipAndCheckMagicNumber(std::ifstream& instream)
 }
 
 
-bool isCRorLF(int const c)
+bool isCarriageReturnOrLineFeed(int const c)
 {
     return c == '\r' or c == '\n';
 }
@@ -61,7 +61,7 @@ bool isCRorLF(int const c)
 int peekNextSignificantCharacter(std::ifstream& instream)
 {
     while (instream.peek() == '#')
-        while (not isCRorLF(instream.get()))
+        while (not isCarriageReturnOrLineFeed(instream.get()))
             ;
     return instream.peek();
 }
@@ -126,6 +126,18 @@ ImageDescriptor nextImage(std::ifstream& instream)
 }
 
 
+bool haveMatchingParameters(
+    ImageDescriptor const& img1,
+    ImageDescriptor const& img2)
+{
+    return (
+        img1.width  == img2.width and
+        img1.height == img2.height and
+        img1.maxval == img2.maxval
+        );
+}
+
+
 int main(int argc, char* argv[])
 {
     if (argc < 2)
@@ -139,9 +151,19 @@ int main(int argc, char* argv[])
 
     std::ifstream instream(infile, std::ifstream::binary);
 
+    std::vector<ImageDescriptor> images;
+
     while (instream.peek() != EOF)
     {
         ImageDescriptor img = nextImage(instream);
+
+        if (images.size() > 0 and not haveMatchingParameters(img, images[0]))
+            throw std::runtime_error(
+                "images must have matching dimensions and grayscale ranges"
+                );
+
+        images.push_back(img);
+
         printf("%ld %ld %ld\n", img.width, img.height, img.maxval);
     }
 }
