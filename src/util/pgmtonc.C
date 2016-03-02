@@ -179,7 +179,6 @@ int main(int argc, char* argv[])
 
     size_t  const m = xdim * ydim;
     size_t  const n = zdim * m;
-    float_t const s = images[0].maxval / 2.0;
 
     boost::shared_ptr<std::vector<float_t> > data(new std::vector<float_t>(n));
     size_t k = 0;
@@ -190,7 +189,7 @@ int main(int argc, char* argv[])
 
         for (size_t j = 0; j < m; ++j)
         {
-            data->at(k) = (float) instream.get() - s;
+            data->at(k) = (float) instream.get();
             ++k;
         }
     }
