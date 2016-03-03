@@ -142,7 +142,7 @@ bool haveMatchingParameters(
 }
 
 
-std::string makeID(std::string const path)
+std::string makeID(std::string const path, std::string const prefix)
 {
     std::string t = path;
 
@@ -151,15 +151,18 @@ std::string makeID(std::string const path)
     if (t.rfind("/") != std::string::npos)
         t = t.substr(t.rfind("/") + 1);
 
-    return derivedID("tomo_float" + t, "tomo_float", "IMP");
+    return derivedID(prefix + t, prefix, "IMP");
 }
 
 
+template<typename T>
 void writeOutput(
     std::string const inpath,
     std::string const outpath,
     std::vector<ImageDescriptor> const& images,
-    std::ifstream& instream)
+    std::ifstream& instream,
+    bool makeSegmentation = false,
+    size_t threshold = 1)
 {
     namespace js = anu_am::json;
 
@@ -170,7 +173,7 @@ void writeOutput(
     size_t  const m = xdim * ydim;
     size_t  const n = zdim * m;
 
-    boost::shared_ptr<std::vector<float_t> > data(new std::vector<float_t>(n));
+    boost::shared_ptr<std::vector<T> > data(new std::vector<T>(n));
     size_t k = 0;
 
     for (size_t i = 0; i < images.size(); ++i)
@@ -179,13 +182,15 @@ void writeOutput(
 
         for (size_t j = 0; j < m; ++j)
         {
-            data->at(k) = (float) instream.get();
+            size_t const x = instream.get();
+            data->at(k) = makeSegmentation ? (x >= threshold) : x;
             ++k;
         }
     }
 
     // Generate metadata to include with the output data
-    std::string const id = makeID(inpath);
+    std::string const prefix = makeSegmentation ? "segmented" : "tomo_float";
+    std::string const id = makeID(inpath, prefix);
     std::string const outfile =
         outpath.size() > 0 ? outpath : (stripTimestamp(id) + ".nc");
 
@@ -201,22 +206,52 @@ void writeOutput(
 
     // Write the resulting data to the output file
     writeVolumeData(
-        data, outfile, "tomo_float", xdim, ydim, zdim,
+        data, outfile, prefix, xdim, ydim, zdim,
         VolumeWriteOptions()
         .datasetID(id)
         .description(description));
 }
 
 
+void usage(char *name)
+{
+    std::cerr << "Usage: " << name
+              << " [-b] [-t N] INPUT [OUTPUT]" << std::endl
+              << "Options:" << std::endl
+              << "    -b write a segmentation" << std::endl
+              << "    -t threshold for segmentation" << std::endl;
+}
+
+
 int main(int argc, char* argv[])
 {
-    if (argc < 2)
+    bool makeSegmentation = false;
+    size_t threshold = 1;
+
+    char c;
+    while ((c = getopt (argc, argv, "bt:")) != -1)
     {
-        std::cerr << "Usage:" << argv[0] << " INPUT [OUTPUT]" << std::endl;
+        switch (c)
+        {
+        case 'b':
+            makeSegmentation = not makeSegmentation;
+            break;
+        case 't':
+            threshold = atoi(optarg);
+            break;
+        default:
+            usage(argv[0]);
+            return 1;
+        }
+    }
+
+    if (argc < optind + 1)
+    {
+        usage(argv[0]);
         return 1;
     }
 
-    std::string const infile = argv[1];
+    std::string const infile = argv[optind];
 
     std::ifstream instream(infile.c_str(), std::ifstream::binary);
 
@@ -237,6 +272,10 @@ int main(int argc, char* argv[])
     if (images.size() == 0)
         throw std::runtime_error("no images found");
 
-    std::string const outfile = argc > 2 ? argv[2] : "";
-    writeOutput(infile, outfile, images, instream);
+    std::string const outfile = argc > optind+1 ? argv[optind+1] : "";
+
+    if (makeSegmentation)
+        writeOutput<int8_t>(infile, outfile, images, instream, true, threshold);
+    else
+        writeOutput<float>(infile, outfile, images, instream);
 }
