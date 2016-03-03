@@ -155,10 +155,61 @@ std::string makeID(std::string const path)
 }
 
 
-int main(int argc, char* argv[])
+void writeOutput(
+    std::string const inpath,
+    std::string const outpath,
+    std::vector<ImageDescriptor> const& images,
+    std::ifstream& instream)
 {
     namespace js = anu_am::json;
 
+    size_t const xdim = images[0].width;
+    size_t const ydim = images[0].height;
+    size_t const zdim = images.size();
+
+    size_t  const m = xdim * ydim;
+    size_t  const n = zdim * m;
+
+    boost::shared_ptr<std::vector<float_t> > data(new std::vector<float_t>(n));
+    size_t k = 0;
+
+    for (size_t i = 0; i < images.size(); ++i)
+    {
+        instream.seekg(images[i].offset, instream.beg);
+
+        for (size_t j = 0; j < m; ++j)
+        {
+            data->at(k) = (float) instream.get();
+            ++k;
+        }
+    }
+
+    // Generate metadata to include with the output data
+    std::string const id = makeID(inpath);
+    std::string const outfile =
+        outpath.size() > 0 ? outpath : (stripTimestamp(id) + ".nc");
+
+    js::Object const fullSpec = js::Object
+        ("id"          , id)
+        ("process"     , "Import Netpbm grayscale (.pgm) image(s) into NetCDF")
+        ("sourcefile"  , __FILE__)
+        ("revision"    , js::Object("id", GIT_REVISION)("date", GIT_TIMESTAMP))
+        ("predecessors", js::Array())
+        ("parameters"  , js::Object("input", inpath));
+
+    std::string const description = js::toString(fullSpec, 2);
+
+    // Write the resulting data to the output file
+    writeVolumeData(
+        data, outfile, "tomo_float", xdim, ydim, zdim,
+        VolumeWriteOptions()
+        .datasetID(id)
+        .description(description));
+}
+
+
+int main(int argc, char* argv[])
+{
     if (argc < 2)
     {
         std::cerr << "Usage:" << argv[0] << " INPUT [OUTPUT]" << std::endl;
@@ -186,45 +237,6 @@ int main(int argc, char* argv[])
     if (images.size() == 0)
         throw std::runtime_error("no images found");
 
-    size_t const xdim = images[0].width;
-    size_t const ydim = images[0].height;
-    size_t const zdim = images.size();
-
-    size_t  const m = xdim * ydim;
-    size_t  const n = zdim * m;
-
-    boost::shared_ptr<std::vector<float_t> > data(new std::vector<float_t>(n));
-    size_t k = 0;
-
-    for (size_t i = 0; i < images.size(); ++i)
-    {
-        instream.seekg(images[i].offset, instream.beg);
-
-        for (size_t j = 0; j < m; ++j)
-        {
-            data->at(k) = (float) instream.get();
-            ++k;
-        }
-    }
-
-    // Generate metadata to include with the output data
-    std::string const id = makeID(infile);
-    std::string const outfile = argc > 2 ? argv[2] : stripTimestamp(id) + ".nc";
-
-    js::Object const fullSpec = js::Object
-        ("id"          , id)
-        ("process"     , "Import Netpbm grayscale (.pgm) image(s) into NetCDF")
-        ("sourcefile"  , __FILE__)
-        ("revision"    , js::Object("id", GIT_REVISION)("date", GIT_TIMESTAMP))
-        ("predecessors", js::Array())
-        ("parameters"  , js::Object("input", infile));
-
-    std::string const description = js::toString(fullSpec, 2);
-
-    // Write the resulting data to the output file
-    writeVolumeData(
-        data, outfile, "tomo_float", xdim, ydim, zdim,
-        VolumeWriteOptions()
-        .datasetID(id)
-        .description(description));
+    std::string const outfile = argc > 2 ? argv[2] : "";
+    writeOutput(infile, outfile, images, instream);
 }
