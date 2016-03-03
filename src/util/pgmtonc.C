@@ -46,10 +46,7 @@ struct ImageDescriptor {
 
 void skipAndCheckMagicNumber(std::ifstream& instream)
 {
-    char magic[2];
-
-    instream.read(&(magic[0]), 2);
-    if (magic[0] != 'P' or magic[1] != '5')
+    if (instream.get() != 'P' or instream.get() != '5')
         throw std::runtime_error("expected magic number 'P5'");
 }
 
@@ -145,22 +142,14 @@ bool haveMatchingParameters(
 }
 
 
-std::string stripExtension(std::string const path)
-{
-    size_t const pos = path.rfind(".");
-    if (pos == std::string::npos)
-        return path;
-    else
-        return path.substr(0, pos);
-}
-
-
 std::string makeID(std::string const path)
 {
-    std::string t = stripExtension(path);
-    size_t const pos = t.rfind("/");
-    if (pos != std::string::npos)
-        t = t.substr(pos+1);
+    std::string t = path;
+
+    if (t.rfind(".") != std::string::npos)
+        t = t.substr(0, t.rfind("."));
+    if (t.rfind("/") != std::string::npos)
+        t = t.substr(t.rfind("/") + 1);
 
     return derivedID("tomo_float" + t, "tomo_float", "IMP");
 }
@@ -238,6 +227,4 @@ int main(int argc, char* argv[])
         VolumeWriteOptions()
         .datasetID(id)
         .description(description));
-
-    //writeVolumeData(data, outfile, "tomo_float", xdim, ydim, zdim);
 }
