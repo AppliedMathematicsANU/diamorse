@@ -16,6 +16,8 @@
 #include <string>
 #include <vector>
 
+#include "json.hpp"
+#include "netcdf.hpp"
 #include "volume_io.hpp"
 
 using namespace anu_am::diamorse;
@@ -143,18 +145,40 @@ bool haveMatchingParameters(
 }
 
 
+std::string stripExtension(std::string const path)
+{
+    size_t const pos = path.rfind(".");
+    if (pos == std::string::npos)
+        return path;
+    else
+        return path.substr(0, pos);
+}
+
+
+std::string makeID(std::string const path)
+{
+    std::string t = stripExtension(path);
+    size_t const pos = t.rfind("/");
+    if (pos != std::string::npos)
+        t = t.substr(pos+1);
+
+    return derivedID("tomo_float" + t, "tomo_float", "IMP");
+}
+
+
 int main(int argc, char* argv[])
 {
-    if (argc < 3)
+    namespace js = anu_am::json;
+
+    if (argc < 2)
     {
-        std::cerr << "Usage:" << argv[0] << " INPUT OUTPUT" << std::endl;
+        std::cerr << "Usage:" << argv[0] << " INPUT [OUTPUT]" << std::endl;
         return 1;
     }
 
-    char* infile = argv[1];
-    char* outfile = argv[2];
+    std::string const infile = argv[1];
 
-    std::ifstream instream(infile, std::ifstream::binary);
+    std::ifstream instream(infile.c_str(), std::ifstream::binary);
 
     std::vector<ImageDescriptor> images;
 
@@ -194,5 +218,26 @@ int main(int argc, char* argv[])
         }
     }
 
-    writeVolumeData(data, outfile, "tomo_float", xdim, ydim, zdim);
+    // Generate metadata to include with the output data
+    std::string const id = makeID(infile);
+    std::string const outfile = argc > 2 ? argv[2] : stripTimestamp(id) + ".nc";
+
+    js::Object const fullSpec = js::Object
+        ("id"          , id)
+        ("process"     , "Import Netpbm grayscale (.pgm) image(s) into NetCDF")
+        ("sourcefile"  , __FILE__)
+        ("revision"    , js::Object("id", GIT_REVISION)("date", GIT_TIMESTAMP))
+        ("predecessors", js::Array())
+        ("parameters"  , js::Object("input", infile));
+
+    std::string const description = js::toString(fullSpec, 2);
+
+    // Write the resulting data to the output file
+    writeVolumeData(
+        data, outfile, "tomo_float", xdim, ydim, zdim,
+        VolumeWriteOptions()
+        .datasetID(id)
+        .description(description));
+
+    //writeVolumeData(data, outfile, "tomo_float", xdim, ydim, zdim);
 }
