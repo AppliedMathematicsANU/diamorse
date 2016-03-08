@@ -234,9 +234,10 @@ int main(int argc, char* argv[])
         switch (c)
         {
         case 'b':
-            makeSegmentation = not makeSegmentation;
+            makeSegmentation = true;
             break;
         case 't':
+            makeSegmentation = true;
             threshold = atoi(optarg);
             break;
         default:
