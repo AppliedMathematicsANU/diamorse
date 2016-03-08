@@ -25,43 +25,21 @@ Installation on MacBook Pro is possible with some modification to the make file.
 
 ## File formats
 
-Diamorse expects input data to be stored in the NetCDF version 3 format.
+All diamorse programs use the NetCDF version 3 file format for input and output of image data. To make the conversion into NetCDF easier, we provide a utility that converts portable graymap (.pgm) files as introduced by the Netpbm library (see http://netpbm.sourceforge.net/doc/pgm.html) into NetCDF. The input pgm file can contain either a single 2d image or a stack of images of equal widths and heights. The format was chosen because it is already being supported by a number of libraries and tools, and is also simple enough to easily write out from within a program without having to rely on a particular library.
 
-We have provided some code for converting other image formats to NetCDF3 as follows. 
+* diamorse/util/pgmtonc.C
 
-* diamorse/python/img2raw.py 
-
-  requires python package *PIL*
-
-  INPUT:  file.img  (a 2d image file in one of the standard formats) 
-
-  OUTPUT:	file.raw (a raw image file with default type uint8)
-          file.info (a text file with info about the image size and type)
-
-  USAGE: `diamorse $ ./python/img2raw.py sample.bmp`
-
-
-* diamorse/src/util/nctomofromraw.C 
-
-  Creates a NetCDF tomo float file from a raw 8-bit (greyscale) 2d or 3d image file.
+  Converts a portable graymap (.pgm) file into NetCDF data.
   
-  INPUT:  file.raw (a raw 8-bit 2d or 3d image file)
-          xdim (OPTIONAL ydim) (the x dimension of the image, and y dimension if input is a 3d image). 
- 
-  OUTPUT:	file.nc (a NetCDF3 file) 
-
-  USAGE: `diamorse $ ./bin/nctomofromraw sample.raw sample.nc XDIM [YDIM]`
-
-* diamorse/src/util/ncfromraw.C
-
-  Creates a NetCDF file from a raw binary (black-and-white) 2d or 3d image file. 
-
-  INPUT:	file.raw (a raw binary 2d or 3d image file)
-          xdim (OPTIONAL ydim) (the x dimension of the image, and y dimension if input is a 3d image). 
-
-  OUTPUT:	file.nc (a NetCDF3 file)
-
-  USAGE: `diamorse $ ./bin/ncfromraw sample.raw sample.nc XDIM [YDIM]`
+  OPTION: -b (create a segmented (black and white) image with all nonzero voxels set to 1)
+  
+  OPTION: -t <int> (create a segmented image with all voxels larger or equal to the specified value set to 1)
+  
+  INPUT:  file.pgm  (a file with either a single 2d image or a stack of images of equal width and height)
+  
+  OUTPUT: segmentedfile.nc OR tomo_floatfile.nc (the corresponding NetCDF file)
+  
+  USAGE:  `diamorse $ ./bin/pgmtonc image.pgm` OR `diamorse $ ./bin/pgmtonc image.pgm -t 128`
 
 * diamorse/main/SEDT.C
 
