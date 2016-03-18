@@ -25,7 +25,7 @@ Installation on MacBook Pro is possible with some modification to the make file.
 
 ## File formats
 
-All diamorse programs use the NetCDF version 3 file format for input and output of image data. To make the conversion into NetCDF easier, we provide a utility that converts portable graymap (.pgm) files as introduced by the Netpbm library (see http://netpbm.sourceforge.net/doc/pgm.html) into NetCDF. The input pgm file can contain either a single 2d image or a stack of images of equal widths and heights. The format was chosen because it is already being supported by a number of libraries and tools, and is also simple enough to easily write out from within a program without having to rely on a particular library.
+All diamorse programs use the NetCDF version 3 file format for input and output of image data. To make the conversion into NetCDF easier, we provide a utility that converts portable graymap (.pgm) files as introduced by the Netpbm library (see http://netpbm.sourceforge.net/doc/pgm.html) into NetCDF. The .pgm format was chosen because it is already being supported by a number of libraries and tools, and is also simple enough to easily write out from within a program without having to rely on a particular library. It allows a single file to contain a sequence of (2D) images, and the conversion program uses this feature to encode a 3D dataset. In other words, if the input .pgm file contains multiple images, each one is taken as a layer in the 3D output dataset, with the first image representing the layer at z=0, the next one that at z=1, and so on. If only a single image is present, the output will effectively be a 2D dataset.
 
 * diamorse/util/pgmtonc.C
 
