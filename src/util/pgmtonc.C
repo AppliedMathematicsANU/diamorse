@@ -270,6 +270,8 @@ int main(int argc, char* argv[])
         images.push_back(img);
     }
 
+    instream.clear();
+
     if (images.size() == 0)
         throw std::runtime_error("no images found");
 
