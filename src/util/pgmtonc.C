@@ -166,6 +166,8 @@ void writeOutput(
 {
     namespace js = anu_am::json;
 
+    bool const is16bit = images[0].maxval > 255;
+
     size_t const xdim = images[0].width;
     size_t const ydim = images[0].height;
     size_t const zdim = images.size();
@@ -182,7 +184,7 @@ void writeOutput(
 
         for (size_t j = 0; j < m; ++j)
         {
-            size_t const x = instream.get();
+            size_t const x = (is16bit ? instream.get() * 256 : 0) + instream.get();
             data->at(k) = makeSegmentation ? (x >= threshold) : x;
             ++k;
         }
