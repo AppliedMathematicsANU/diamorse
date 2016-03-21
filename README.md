@@ -29,7 +29,7 @@ All diamorse programs use the NetCDF version 3 file format for input and output 
 
 * diamorse/util/pgmtonc.C
 
-  Converts a portable graymap (.pgm) file into NetCDF data.
+  Converts a portable graymap (.pgm) file into NetCDF data. At present, only 8-bit images (maxval < 256) are supported. Please contact us if you need 16-bit support.
   
   OPTION: -b (create a segmented (black and white) image with all nonzero voxels set to 1)
   
