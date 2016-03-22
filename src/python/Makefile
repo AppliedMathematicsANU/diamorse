@@ -6,14 +6,7 @@ EXTRA_INCL  = -I ../lib
 CXXOPTS     = -ansi -g -O3
 CXXFLAGS    = $(CXXOPTS) $(PYTHON_INCL) $(NUMPY_INCL) $(EXTRA_INCL)
 BINDIR      = ../../bin
-
-ifeq ($(UNAME), Darwin)
-BOOST_LIBS  = -lboost_filesystem-mt -lboost_system-mt
-else
-BOOST_LIBS = -lboost_filesystem -lboost_system
-endif
-
-LDFLAGS     = -lpython2.7 $(BOOST_LIBS)
+LDFLAGS     = -lpython2.7
 
 MAKEDEPEND  = $(CXX) $(CXXFLAGS) -MM -MP -MT $(BINDIR)/$*.so -o $*.P $<
 

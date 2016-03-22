@@ -13,12 +13,17 @@
 #ifndef ANU_AM_DIAMORSE_VOLUMEIO_HPP
 #define ANU_AM_DIAMORSE_VOLUMEIO_HPP
 
+#include <cerrno>
 #include <cmath>
+#include <cstdio>
 #include <ctime>
 #include <iomanip>
 #include <sstream>
 #include <stdexcept>
-#include <boost/filesystem.hpp>
+
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <dirent.h>
 
 #include "netcdf.hpp"
 #include "netcdfIO.hpp"
@@ -103,26 +108,51 @@ struct InverseTraits<double>
 };
 
 
+void reportFileError(std::string const msg, std::string const path)
+{
+    std::string const fullMsg = msg + " '" + path + "'";
+    perror(fullMsg.c_str());
+}
+
+
 std::vector<std::string> entries(std::string const filepath)
 {
-    using namespace boost::filesystem;
-
-    path const p(filepath);
+    char const *cpath = filepath.c_str();
     std::vector<std::string> result;
 
-    if (is_directory(p))
-    {
-        directory_iterator iter;
-        for (iter = directory_iterator(p); iter != directory_iterator(); ++iter)
-        {
-            path const entry = iter->path();
-            std::string const name = entry.string();
-            if (name.rfind(".nc") == name.size() - 3)
-                result.push_back(name);
-        }
+    struct stat sb;
+
+    if (stat(cpath, &sb) != 0) {
+        reportFileError("could not find file", filepath);
+        return result;
     }
-    else
-        result.push_back(filepath);
+
+    if (not S_ISDIR(sb.st_mode)) {
+        result.push_back(cpath);
+        return result;
+    }
+
+    DIR *dirp;
+    struct dirent *dp;
+
+    if ((dirp = opendir(cpath)) == NULL) {
+        reportFileError("could not open directory", filepath);
+        return result;
+    }
+
+    do {
+        errno = 0;
+        if ((dp = readdir(dirp)) != NULL) {
+            std::string const name = dp->d_name;
+            if (name.size() > 2 && name.rfind(".nc") == name.size() - 3)
+                result.push_back(filepath + '/' + name);
+        }
+    } while (dp != NULL);
+
+    closedir(dirp);
+
+    if (errno != 0)
+        reportFileError("error reading directory", filepath);
 
     return result;
 }
@@ -564,7 +594,7 @@ class VolumeWriteOptions
 public:
     VolumeWriteOptions()
         : _computeHistogram(true),
-          _fileSizeLimit(1024 * 1024 * 1024)
+          _fileSizeLimit(/*1024*/ 8 * 1024 * 1024)
     {
     }
 
@@ -663,8 +693,10 @@ void writeVolumeData(
         ("dataset_id", dataset_id)
         ("history_"+dataset_id, options.description());
 
-    if (nrChunks > 1)
-        boost::filesystem::create_directory(base.c_str());
+    if (nrChunks > 1) {
+        if (mkdir(base.c_str(), 0777) != 0)
+            reportFileError("could not create directory", base);
+    }
 
     for (size_t i = 0; i < nrChunks; ++i)
     {

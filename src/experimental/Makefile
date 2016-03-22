@@ -11,12 +11,6 @@ CXXLIBS  = -I ../lib
 CXXFLAGS = $(CXXDEFS) $(CXXWARN) $(CXXDEBUG) $(CXXOPTIM) $(CXXLIBS)
 BINDIR   = ../../bin
 
-ifeq ($(UNAME), Darwin)
-LDFLAGS  = -lboost_filesystem-mt -lboost_system-mt
-else
-LDFLAGS  = -lboost_filesystem -lboost_system
-endif
-
 MAKEDEPEND= $(CXX) $(CXXFLAGS) -MM -MP -MT $(BINDIR)/$* -o $*.P $<
 
 .PHONY:	all clean
@@ -25,7 +19,7 @@ MAKEDEPEND= $(CXX) $(CXXFLAGS) -MM -MP -MT $(BINDIR)/$* -o $*.P $<
 
 $(BINDIR)/% : %.C
 	@$(MAKEDEPEND);
-	$(CXX) $(CXXFLAGS) $< -o $@ $(LDFLAGS)
+	$(CXX) $(CXXFLAGS) $< -o $@
 
 
 SRCS := $(wildcard *.C)
