@@ -687,10 +687,7 @@ void writeVolumeData(
     if (dataset_id.size() == 0)
         dataset_id = timestamp() + "_" + basename(path);
 
-    std::vector<size_t> grid_size;
-    grid_size.push_back(xdim);
-    grid_size.push_back(ydim);
-    grid_size.push_back(zdim);
+    size_t const grid_size[] = { xdim, ydim, zdim };
 
     Attributes attr = options.fileAttributes()
         ("zdim_total", zdim)
