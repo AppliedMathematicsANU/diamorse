@@ -594,7 +594,7 @@ class VolumeWriteOptions
 public:
     VolumeWriteOptions()
         : _computeHistogram(true),
-          _fileSizeLimit(/*1024*/ 8 * 1024 * 1024)
+          _fileSizeLimit(1024 * 1024 * 1024)
     {
     }
 
