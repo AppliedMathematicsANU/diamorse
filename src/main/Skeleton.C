@@ -35,7 +35,8 @@ Mask skeleton(
     CubicalComplex const& complex,
     Scalars const& scalars,
     Field const& field,
-    float const threshold = 0)
+    float const threshold = 0,
+    int const dimension = 3)
 {
     Field::Vectors V = field.V();
     Facets I(complex.xdim(), complex.ydim(), complex.zdim(), false);
@@ -45,7 +46,10 @@ Mask skeleton(
 
     for (Cell s = 0; s <= complex.cellIdLimit(); ++s)
     {
-        if (not (complex.isCell(s) and field.isCritical(s)))
+        if (not (complex.isCell(s) and
+                 field.isCritical(s) and
+                 complex.cellDimension(s) <= dimension)
+            )
             continue;
 
         bool good = true;
@@ -89,11 +93,15 @@ int main(int argc, char* argv[])
 
     int c;
     float threshold = 0;
+    int dimension = 3;
 
-    while ((c = getopt (argc, argv, "t:")) != -1)
+    while ((c = getopt (argc, argv, "d:t:")) != -1)
     {
         switch (c)
         {
+        case 'd':
+            dimension = atoi(optarg);
+            break;
         case 't':
             threshold = atof(optarg);
             break;
@@ -129,7 +137,7 @@ int main(int argc, char* argv[])
     Field field = Field(dims.at(0), dims.at(1), dims.at(2), fieldData);
 
     // Process the data.
-    Mask const out = skeleton(complex, scalars, field, threshold);
+    Mask const out = skeleton(complex, scalars, field, threshold, dimension);
 
     // Generate metadata to include with the output data
     std::string const parentID = guessDatasetID(fieldPath, info.attributes());
