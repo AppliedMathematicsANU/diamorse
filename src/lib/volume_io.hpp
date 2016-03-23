@@ -569,6 +569,9 @@ struct Histogram
         offset = min;
         binsize = (max - min) * (1.0 + 1.0e-12) / numberOfBins;
 
+        if (binsize == 0)
+            binsize = 1;
+
         if (type != NC_FLOAT and type != NC_DOUBLE)
             binsize = ceil(binsize);
 
