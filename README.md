@@ -22,7 +22,7 @@ In order to compile diamorse, you will need *git*, a C++ compiler, the *Boost* l
 * Run `make main` to compile only the main analysis programs, or `make` to also compile some utility programs.
 * Run `make python` to compile the python wrappers (optional, requires *cython* and *numpy*). Some of the Python scripts provided require *matplotlib*.
 
-We have installed and run the code successfully under Linux and OS X, and expect that it will work out of the box on most Unix/Posix compatible systems. It is also possible to use diamorse under Windows via *Cygwin* (see the file `cygwin.md` for details).
+We have installed and run the code successfully under Linux and OS X, and expect that it will work out of the box on most Unix/Posix compatible systems. It is also possible to use diamorse under Windows via *Cygwin* (see the file [cygwin.md](https://github.com/AppliedMathematicsANU/diamorse/blob/master/cygwin.md) for details).
 
 ## File formats
 
