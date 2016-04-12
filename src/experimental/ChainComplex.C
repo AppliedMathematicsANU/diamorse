@@ -13,8 +13,6 @@
 #include <fstream>
 #include <sstream>
 
-#include "boost/format.hpp"
-
 #include "collections.hpp"
 #include "chainComplexExtraction.hpp"
 #include "CubicalComplex.hpp"
