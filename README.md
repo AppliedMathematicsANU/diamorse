@@ -18,6 +18,7 @@ Below is some minimal information that should help you get started. We plan to a
 In order to compile diamorse, you will need *git*, a C++ compiler, the *Boost* library, and a GNU-compatible *make*.
 
 * Clone this repository to your machine: `git clone https://github.com/AppliedMathematicsANU/diamorse.git`
+* Change into the newly created directory: `cd diamorse`
 * Run `make main` to compile only the main analysis programs, or `make` to also compile some utility programs.
 * Run `make python` to compile the python wrappers (optional, requires *cython* and *numpy*).
 
