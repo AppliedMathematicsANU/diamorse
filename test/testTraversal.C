@@ -364,7 +364,7 @@ Result checkConnections(VolumeData const& candidate)
 
     std::vector<Cell> const sources = criticalCells(candidate);
 
-    boost::shared_ptr<std::vector<bool> > marked =
+    std::shared_ptr<std::vector<bool> > marked =
         connectingPaths(complex, field, V, coV, I, coI);
 
     for (size_t v = 0; v < complex.cellIdLimit(); ++v)

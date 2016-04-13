@@ -21,7 +21,7 @@
 #include <string>
 #include <vector>
 
-#include "boost/smart_ptr.hpp"
+#include <memory>
 
 #include "OrderedMap.hpp"
 
@@ -398,15 +398,15 @@ struct TypedAttrImpl : public AttrImpl
 
 
 template<typename T>
-boost::shared_ptr<AttrImpl> makeImpl(std::vector<T> const& values)
+std::shared_ptr<AttrImpl> makeImpl(std::vector<T> const& values)
 {
-    return boost::shared_ptr<AttrImpl>(
+    return std::shared_ptr<AttrImpl>(
         new TypedAttrImpl<InverseTraits<T>::type>(values));
 }
 
 
 template<>
-boost::shared_ptr<AttrImpl> makeImpl<char>(std::vector<char> const& text)
+std::shared_ptr<AttrImpl> makeImpl<char>(std::vector<char> const& text)
 {
     std::vector<uint8_t> values(text.begin(), text.end());
     return makeImpl(values);
@@ -414,7 +414,7 @@ boost::shared_ptr<AttrImpl> makeImpl<char>(std::vector<char> const& text)
 
 
 template<>
-boost::shared_ptr<AttrImpl> makeImpl<size_t>(std::vector<size_t> const& values)
+std::shared_ptr<AttrImpl> makeImpl<size_t>(std::vector<size_t> const& values)
 {
     std::vector<int32_t> const converted(values.begin(), values.end());
     return makeImpl(converted);
@@ -422,7 +422,7 @@ boost::shared_ptr<AttrImpl> makeImpl<size_t>(std::vector<size_t> const& values)
 
 
 template<>
-boost::shared_ptr<AttrImpl> makeImpl<uint32_t>(std::vector<uint32_t> const& values)
+std::shared_ptr<AttrImpl> makeImpl<uint32_t>(std::vector<uint32_t> const& values)
 {
     std::vector<int32_t> const converted(values.begin(), values.end());
     return makeImpl(converted);
@@ -430,7 +430,7 @@ boost::shared_ptr<AttrImpl> makeImpl<uint32_t>(std::vector<uint32_t> const& valu
 
 
 template<typename T, size_t N>
-boost::shared_ptr<AttrImpl> makeImpl(T const(&a)[N])
+std::shared_ptr<AttrImpl> makeImpl(T const(&a)[N])
 {
     std::vector<T> values(a, a + N);
 
@@ -439,7 +439,7 @@ boost::shared_ptr<AttrImpl> makeImpl(T const(&a)[N])
 
 
 template<typename T>
-boost::shared_ptr<AttrImpl> makeImpl(T const value)
+std::shared_ptr<AttrImpl> makeImpl(T const value)
 {
     std::vector<T> values;
     values.push_back(value);
@@ -449,7 +449,7 @@ boost::shared_ptr<AttrImpl> makeImpl(T const value)
 
 
 template<typename T>
-boost::shared_ptr<AttrImpl> makeImpl(T const v1, T const v2)
+std::shared_ptr<AttrImpl> makeImpl(T const v1, T const v2)
 {
     std::vector<T> values;
     values.push_back(v1);
@@ -460,7 +460,7 @@ boost::shared_ptr<AttrImpl> makeImpl(T const v1, T const v2)
 
 
 template<>
-boost::shared_ptr<AttrImpl> makeImpl<std::string>(std::string const text)
+std::shared_ptr<AttrImpl> makeImpl<std::string>(std::string const text)
 {
     std::vector<uint8_t> values(text.begin(), text.end());
     return makeImpl(values);
@@ -469,7 +469,7 @@ boost::shared_ptr<AttrImpl> makeImpl<std::string>(std::string const text)
 
 class Attribute
 {
-    boost::shared_ptr<AttrImpl> _impl;
+    std::shared_ptr<AttrImpl> _impl;
 
 public:
     Attribute()
@@ -1026,7 +1026,7 @@ public:
 class Accessor
 {
 public:
-    typedef boost::shared_ptr<AccImpl> ImplPtr;
+    typedef std::shared_ptr<AccImpl> ImplPtr;
 
 private:
     ImplPtr _impl;
@@ -1064,7 +1064,7 @@ Accessor makeAccessor(
     size_t const start)
 {
     AccImpl *acc = new BufferAccImpl<NCType, Buffer>(dims, buf, start);
-    return Accessor(boost::shared_ptr<AccImpl>(acc));
+    return Accessor(std::shared_ptr<AccImpl>(acc));
 }
 
 

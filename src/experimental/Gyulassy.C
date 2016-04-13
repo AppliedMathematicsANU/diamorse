@@ -17,7 +17,7 @@
 #include <vector>
 #include <utility>
 
-#include "boost/smart_ptr.hpp"
+#include <memory>
 
 #include "collections.hpp"
 #include "CubicalComplex.hpp"
@@ -52,7 +52,7 @@ struct VertexInfo
     }
 };
 
-typedef boost::shared_ptr<VertexInfo> InfoPtr;
+typedef std::shared_ptr<VertexInfo> InfoPtr;
 typedef VertexMap<CubicalComplex, InfoPtr> InfoMap;
 
 

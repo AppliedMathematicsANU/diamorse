@@ -13,6 +13,7 @@
 
 #include <cctype>
 #include <fstream>
+#include <getopt.h>
 #include <string>
 #include <vector>
 
@@ -175,7 +176,7 @@ void writeOutput(
     size_t  const m = xdim * ydim;
     size_t  const n = zdim * m;
 
-    boost::shared_ptr<std::vector<T> > data(new std::vector<T>(n));
+    std::shared_ptr<std::vector<T> > data(new std::vector<T>(n));
     size_t k = 0;
 
     for (size_t i = 0; i < images.size(); ++i)

@@ -10,6 +10,7 @@
  *
  */
 
+#include <getopt.h>
 #include <limits>
 #include <sstream>
 #include <stdlib.h>

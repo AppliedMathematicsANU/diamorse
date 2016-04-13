@@ -19,7 +19,7 @@
 #include <vector>
 #include <utility>
 
-#include "boost/smart_ptr.hpp"
+#include <memory>
 
 #include "collections.hpp"
 #include "CubicalComplex.hpp"
@@ -174,7 +174,7 @@ struct CellInfo
     }
 };
 
-typedef boost::shared_ptr<CellInfo> InfoPtr;
+typedef std::shared_ptr<CellInfo> InfoPtr;
 typedef std::vector<InfoPtr> InfoMap;
 
 

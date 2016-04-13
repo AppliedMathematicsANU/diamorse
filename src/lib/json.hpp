@@ -19,7 +19,7 @@
 #include <string>
 #include <vector>
 
-#include "boost/smart_ptr.hpp"
+#include <memory>
 
 
 namespace anu_am
@@ -49,7 +49,7 @@ struct Value
 };
 
 
-typedef boost::shared_ptr<Value const> ValuePointer;
+typedef std::shared_ptr<Value const> ValuePointer;
 
 
 struct Null : public Value

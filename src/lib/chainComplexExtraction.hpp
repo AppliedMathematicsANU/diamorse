@@ -13,6 +13,7 @@
 #ifndef ANU_AM_DIAMORSE_CHAINCOMPLEXEXTRACTION_HPP
 #define ANU_AM_DIAMORSE_CHAINCOMPLEXEXTRACTION_HPP
 
+#include <memory>
 
 #include "CubicalComplex.hpp"
 #include "traversals.hpp"
@@ -27,7 +28,7 @@ namespace diamorse
 
 
 template<class Field, class Vectors, class Incidences>
-boost::shared_ptr<std::vector<bool> >
+std::shared_ptr<std::vector<bool> >
 connectingPaths(
     CubicalComplex const& complex,
     Field const& field,

@@ -214,7 +214,7 @@ void simplify(
     typename Field::Vectors coV = field.coV();
 
     size_t const n = complex.cellIdLimit();
-    boost::shared_ptr<std::vector<bool> > marked =
+    std::shared_ptr<std::vector<bool> > marked =
         connectingPaths(complex, field, V, coV, I, coI);
     Incidences rI(I, marked);
     Incidences rcoI(coI, marked);

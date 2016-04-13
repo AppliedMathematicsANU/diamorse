@@ -1,10 +1,11 @@
 UNAME := $(shell uname)
 
-CXXWARN  = -Wall -Wextra -ansi -pedantic
+CXXSTD   = -std=c++11
+CXXWARN  = -Wall -Wextra -pedantic
 CXXOPTIM = -O3
 CXXDEBUG = -g
 CXXLIBS  = -I ../src/lib
-CXXFLAGS = $(CXXWARN) $(CXXDEBUG) $(CXXOPTIM) $(CXXLIBS)
+CXXFLAGS = $(CXXSTD) $(CXXWARN) $(CXXDEBUG) $(CXXOPTIM) $(CXXLIBS)
 BINDIR   = bin
 
 ifeq ($(UNAME), Darwin)

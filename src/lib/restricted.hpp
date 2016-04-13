@@ -15,7 +15,7 @@
 
 #include <set>
 
-#include "boost/smart_ptr.hpp"
+#include <memory>
 
 
 namespace anu_am
@@ -28,12 +28,12 @@ template<class Incidences>
 class RestrictedIncidences
 {
     Incidences I_;
-    boost::shared_ptr<std::vector<bool> > good_;
+    std::shared_ptr<std::vector<bool> > good_;
 
 public:
     RestrictedIncidences(
         Incidences const& I,
-        boost::shared_ptr<std::vector<bool> > good)
+        std::shared_ptr<std::vector<bool> > good)
         : I_(I),
           good_(good)
     {
@@ -70,7 +70,7 @@ public:
 template<class VectorField, class Incidences>
 void mark(
     size_t const s,
-    boost::shared_ptr<std::vector<bool> >& marked,
+    std::shared_ptr<std::vector<bool> >& marked,
     bool const value,
     VectorField const& V,
     Incidences const& I)
@@ -102,7 +102,7 @@ void mark(
 
 
 template<class VectorField, class Incidences>
-boost::shared_ptr<std::vector<bool> > connectingPaths(
+std::shared_ptr<std::vector<bool> > connectingPaths(
     size_t const size,
     std::vector<size_t> const& downstreamSources,
     std::vector<size_t> const& upstreamSources,
@@ -115,8 +115,8 @@ boost::shared_ptr<std::vector<bool> > connectingPaths(
 {
     typedef std::vector<bool> Bits;
 
-    boost::shared_ptr<Bits> active(new Bits(size));
-    boost::shared_ptr<Bits> result(new Bits(size));
+    std::shared_ptr<Bits> active(new Bits(size));
+    std::shared_ptr<Bits> result(new Bits(size));
 
     for (size_t i = 0; i < downstreamSources.size(); ++i)
         mark(downstreamSources.at(i), active, true, V, I);

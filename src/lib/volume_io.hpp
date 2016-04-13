@@ -13,6 +13,7 @@
 #ifndef ANU_AM_DIAMORSE_VOLUMEIO_HPP
 #define ANU_AM_DIAMORSE_VOLUMEIO_HPP
 
+#include <algorithm>
 #include <cerrno>
 #include <cmath>
 #include <cstdio>
@@ -213,9 +214,9 @@ std::vector<size_t> readDimensions(std::string const path)
 
 
 template<typename T>
-boost::shared_ptr<std::vector<T> > readVolumeData(std::string const path)
+std::shared_ptr<std::vector<T> > readVolumeData(std::string const path)
 {
-    typedef boost::shared_ptr<std::vector<T> > DataPtr;
+    typedef std::shared_ptr<std::vector<T> > DataPtr;
 
     Tag const type = InverseTraits<T>::type;
 
@@ -277,7 +278,7 @@ template<typename T>
 class VectorAccessorImpl : public AccImpl
 {
 public:
-    typedef boost::shared_ptr<std::vector<T> > DataPtr;
+    typedef std::shared_ptr<std::vector<T> > DataPtr;
 
 private:
     DataPtr _data;
@@ -344,7 +345,7 @@ public:
 
 template<typename T>
 Accessor makeVectorAccessor(
-    boost::shared_ptr<std::vector<T> > const data,
+    std::shared_ptr<std::vector<T> > const data,
     size_t const xdim,
     size_t const ydim,
     size_t const zdim,
@@ -356,7 +357,7 @@ Accessor makeVectorAccessor(
     AccImpl *acc =
         new VectorAccessorImpl<T>(data, xdim, ydim, zdim, xoff, yoff, zoff);
 
-    return Accessor(boost::shared_ptr<AccImpl>(acc));
+    return Accessor(std::shared_ptr<AccImpl>(acc));
 }
 
 
@@ -542,10 +543,10 @@ struct Histogram
     double offset;
     double binsize;
 
-    boost::shared_ptr<std::vector<double> > data;
+    std::shared_ptr<std::vector<double> > data;
 
     template<typename T>
-    Histogram(boost::shared_ptr<std::vector<T> > const inputs,
+    Histogram(std::shared_ptr<std::vector<T> > const inputs,
               size_t const numberOfBins = 0x10000)
         : data(new std::vector<double>(numberOfBins))
     {
@@ -671,7 +672,7 @@ public:
 
 template<typename T>
 void writeVolumeData(
-    boost::shared_ptr<std::vector<T> > const data,
+    std::shared_ptr<std::vector<T> > const data,
     std::string const path,
     std::string const varname,
     size_t const xdim, size_t const ydim, size_t const zdim,

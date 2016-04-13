@@ -3,7 +3,7 @@ UNAME := $(shell uname)
 PYTHON_INCL = -I /usr/include/python2.7
 NUMPY_INCL  = -I $(shell python -c "import numpy; print numpy.get_include()")
 EXTRA_INCL  = -I ../lib
-CXXOPTS     = -ansi -g -O3 -Wno-cpp
+CXXOPTS     = -std=c++11 -g -O3 -Wno-cpp
 CXXFLAGS    = $(CXXOPTS) $(PYTHON_INCL) $(NUMPY_INCL) $(EXTRA_INCL)
 BINDIR      = ../../bin
 LDFLAGS     = -lpython2.7
