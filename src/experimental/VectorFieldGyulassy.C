@@ -405,11 +405,13 @@ void grow(
                 derivedDistribution(cell, lower, info, scalars, vertices);
             info.at(cell)->weights = dist;
 
-            //TODO determine partner for v and update endpoints here...
+            Set<Cell> allEndPoints;
+            for (size_t i = 0; i < lower.size(); ++i) {
+                Cell const w = lower.at(i).first;
+                allEndPoints = allEndPoints + info.at(w)->endPoints;
+            }
 
-            // std::set<size_t> seen;
-            // for (size_t i = 0; i < lower.size(); ++i)
-            //     seen.insert(info.at(lower.at(i))->basin);
+            //TODO determine partner for v and update endpoints here...
 
             // std::pair<size_t, Value> best;
             // size_t count = 0;
