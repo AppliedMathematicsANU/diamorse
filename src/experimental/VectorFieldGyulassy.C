@@ -1,16 +1,15 @@
 /** -*-c++-*-
  *
- *  Copyright 2015 The Australian National University
+ *  Copyright 2016 The Australian National University
  *
  *  VectorFieldGyulassy.C
  *
  *  Gradient vector field computed via the Gyulassy-Bremer-Pascucci method.
  *
- *  Olaf Delgado-Friedrichs jun 15
+ *  Olaf Delgado-Friedrichs apr 16
  *
  */
 
-//TODO various details to adjust and blanks to fill in
 
 #include <algorithm>
 #include <map>
@@ -262,19 +261,34 @@ Distribution combine(Distribution const& c, InfoMap const& info)
 }
 
 
+Value cellAverage(Cell const v, Scalars const scalars, Vertices const vertices)
+{
+    size_t const n = vertices.count(v);
+
+    Value sum = 0;
+    for (size_t i = 0; i < n; ++i)
+        sum += scalars.get(vertices(v, i));
+
+    return sum / n;
+}
+
+
 Distribution derivedDistribution(
     Cell const v,
-    std::vector<Cell> const& nbrs,
+    std::vector<std::pair<Cell, Cell> > const& nbrs,
     InfoMap const& info,
-    Scalars const& values)
+    Scalars const& values,
+    Vertices const& vertices)
 {
-    //TODO adjust to general case (not just vertices)
     size_t const n = nbrs.size();
+    Value const val0 = cellAverage(v, values, vertices);
+
     std::vector<Value> weights(n);
     Value sum = 0;
     for (size_t i = 0; i < n; ++i)
     {
-        Value const w = std::max(0.0f, values(v) - values(nbrs.at(i)));
+        Value const val = cellAverage(nbrs.at(i).first, values, vertices);
+        Value const w = std::max(0.0f, val0 - val);
         weights.at(i) = w;
         sum += w;
     }
@@ -290,21 +304,9 @@ Distribution derivedDistribution(
 
     Distribution c(n);
     for (size_t i = 0; i < n; ++i)
-        c.at(i) = std::make_pair(nbrs.at(i), weights.at(i) / sum);
+        c.at(i) = std::make_pair(nbrs.at(i).first, weights.at(i) / sum);
 
     return combine(c, info);
-}
-
-
-Value cellAverage(Cell const v, Scalars const scalars, Vertices const vertices)
-{
-    size_t const n = vertices.count(v);
-
-    Value sum = 0;
-    for (size_t i = 0; i < n; ++i)
-        sum += scalars.get(vertices(v, i));
-
-    return sum / n;
 }
 
 
@@ -395,34 +397,36 @@ void grow(
             info.at(cell)->weights = Distribution(1);
             info.at(cell)->weights.at(0) = std::make_pair(cell, 1);
             info.at(cell)->endPoints = Set<Cell>(cell);
+            outputField.setPartner(cell, cell);
         }
         else
         {
+            Distribution const dist =
+                derivedDistribution(cell, lower, info, scalars, vertices);
+            info.at(cell)->weights = dist;
 
-    //         Distribution const dist =
-    //             derivedDistribution(v, lower, info, scalars);
-    //         info.at(v)->weights = dist;
+            //TODO determine partner for v and update endpoints here...
 
-    //         std::set<size_t> seen;
-    //         for (size_t i = 0; i < lower.size(); ++i)
-    //             seen.insert(info.at(lower.at(i))->basin);
+            // std::set<size_t> seen;
+            // for (size_t i = 0; i < lower.size(); ++i)
+            //     seen.insert(info.at(lower.at(i))->basin);
 
-    //         std::pair<size_t, Value> best;
-    //         size_t count = 0;
-    //         for (size_t i = 0; i < dist.size(); ++i)
-    //             if (seen.count(dist.at(i).first) > 0)
-    //                 if (++count == 1 or dist.at(i).second > best.second)
-    //                     best = dist.at(i);
+            // std::pair<size_t, Value> best;
+            // size_t count = 0;
+            // for (size_t i = 0; i < dist.size(); ++i)
+            //     if (seen.count(dist.at(i).first) > 0)
+            //         if (++count == 1 or dist.at(i).second > best.second)
+            //             best = dist.at(i);
 
-    //         info.at(v)->basin = best.first;
+            // info.at(v)->basin = best.first;
         }
 
-    //     for (size_t i = 0; i < lower.size(); ++i)
-    //     {
-    //         Cell const w = lower.at(i);
-    //         if (--(info.at(w)->countDown) == 0)
-    //             info.at(w) = InfoPtr();
-    //     }
+        for (size_t i = 0; i < lower.size(); ++i)
+        {
+            Cell const w = lower.at(i).first;
+            if (--(info.at(w)->countDown) == 0)
+                info.at(w) = InfoPtr();
+        }
     }
 }
 
