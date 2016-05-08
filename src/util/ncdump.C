@@ -6,20 +6,20 @@
  *
  *  Prints the header of a NetCDF 3 file in a CDL-like format.
  *
- *  Olaf Delgado-Friedrichs jan 15
+ *  Olaf Delgado-Friedrichs may 16
  *
  */
 
 #include <libgen.h>
 
-#include "boost/algorithm/string.hpp"
-
 #include "collections.hpp"
 #include "netcdf.hpp"
 #include "netcdfIO.hpp"
+#include "stringUtils.hpp"
 
 using namespace anu_am::netcdf;
 using namespace anu_am::diamorse;
+using namespace anu_am::stringutils;
 
 
 std::string tname(Tag const type)
@@ -40,7 +40,7 @@ std::string tname(Tag const type)
 std::string stripname(std::string const path)
 {
     char *s = new char[path.size()+1];
-    strncpy(s, path.c_str(), path.size()+1);
+    path.copy(s, path.size()+1);
 
     std::string const base = basename(s);
     delete s;
@@ -52,9 +52,9 @@ std::string stripname(std::string const path)
 std::string formatString(std::string const input)
 {
     std::string s(input);
-    boost::replace_all(s, "\\", "\\\\");
-    boost::replace_all(s, "\"", "\\\"");
-    boost::replace_all(s, "\n", "\\n\",\n\t\t\t\"");
+    s = replaceAll(s, '\\', "\\\\");
+    s = replaceAll(s, '\"', "\\\"");
+    s = replaceAll(s, '\n', "\\n\",\n\t\t\t\"");
 
     return "\"" + s + "\"";
 }

@@ -6,13 +6,14 @@
  *
  *  Some functions for processing strings.
  *
- *  Olaf Delgado-Friedrichs jun 15
+ *  Olaf Delgado-Friedrichs may 16
  *
  */
 
 #ifndef ANU_AM_STRINGUTILS_HPP
 #define ANU_AM_STRINGUTILS_HPP
 
+#include <sstream>
 #include <string>
 
 namespace anu_am
@@ -54,6 +55,29 @@ std::vector<std::string> split(std::string const str, char const sep)
     }
 
     return result;
+}
+
+std::string replaceAll(std::string const str,
+                       char const sep,
+                       std::string const replacement)
+{
+    std::ostringstream ss;
+
+    size_t pos = 0;
+    while (pos < str.size())
+    {
+        size_t next = str.find(sep, pos);
+        if (next == std::string::npos)
+            next = str.size();
+
+        ss << str.substr(pos, next - pos);
+        if (next < str.size())
+            ss << replacement;
+
+        pos = next + 1;
+    }
+
+    return ss.str();
 }
 
 } // namespace stringutils
