@@ -1,5 +1,5 @@
-PYTHON_PREFIX  := $(shell python -c "import sys; print sys.prefix")
-PYTHON_VERSION := $(shell python -c "import sys;\
+PYTHON_PREFIX  = $(shell python -c "import sys; print sys.prefix")
+PYTHON_VERSION = $(shell python -c "import sys;\
 print '%d.%d' % (sys.version_info.major, sys.version_info.minor)")
 
 PYTHON_INCL = -I ${PYTHON_PREFIX}/include/python${PYTHON_VERSION}
