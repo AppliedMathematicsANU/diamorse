@@ -2,7 +2,6 @@
 
     gcc-g++ (Devel)
     make (Devel)
-    libboost-devel (Libs)
     git (Devel)
     time (Utils)
 
