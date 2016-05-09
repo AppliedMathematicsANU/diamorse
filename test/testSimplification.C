@@ -1,23 +1,21 @@
 /** -*-c++-*-
  *
- *  Copyright 2014 The Australian National University
+ *  Copyright 2016 The Australian National University
  *
  *  testSimplification.C
  *
  *  Tests the gradient vector field simplification algorithm.
  *
- *  Olaf Delgado-Friedrichs mar 14
+ *  Olaf Delgado-Friedrichs may 16
  *
  */
 
 #include "generative.hpp"
 #include "common.hpp"
-#include "booster.hpp"
 
 #include "simplification.hpp"
 
 using namespace anu_am::generative;
-using namespace anu_am::generative::booster;
 using namespace anu_am::diamorse;
 
 
@@ -73,31 +71,6 @@ anu_am::generative::Result checkWithSimplifiedVolumeData(
 // === Tests start here.
 
 
-SIMPLE_TEST_CASE(
-    theVectorFieldIsComplete,
-    checkWithSimplifiedVolumeData(forAllCells(vectorDirectionIsDefined)))
-
-SIMPLE_TEST_CASE(
-    noVectorsAreMarkedAsPointingOutward,
-    checkWithSimplifiedVolumeData(forAllCells(vectorIsNotOutwardPointing)))
-
-SIMPLE_TEST_CASE(
-    noVectorsAreActuallyPointingOutward,
-    checkWithSimplifiedVolumeData(forAllCells(directionIsNotOutwardPointing)))
-
-SIMPLE_TEST_CASE(
-    directionsAndCellPartnersMatch,
-    checkWithSimplifiedVolumeData(forAllCells(cellPartnerMatchesDirection)))
-
-SIMPLE_TEST_CASE(
-    theCellPairingIsSymmetrical,
-    checkWithSimplifiedVolumeData(forAllCells(partnerOfPartnerIsOriginalCell)))
-
-SIMPLE_TEST_CASE(
-    theDiscreteVectorFieldIsAGradientVectorField,
-    checkWithSimplifiedVolumeData(containsNoCyclicVPaths))
-
-
 Result checkOriginalVersusSimplifiedHomology(VolumeData const& candidate)
 {
     return checkPersistentHomology(
@@ -105,16 +78,6 @@ Result checkOriginalVersusSimplifiedHomology(VolumeData const& candidate)
         convertedChainComplex(Simplified(THRESHOLD)(candidate)),
         THRESHOLD);
 }
-
-SIMPLE_TEST_CASE(
-    originalAndSimplifiedComplexHaveTheSamePersistentHomoloy,
-    checkWithVolumeData(checkOriginalVersusSimplifiedHomology))
-
-
-SIMPLE_TEST_CASE(
-    vectorFieldIsCompatibleWithScalars,
-    checkWithSimplifiedVolumeData(
-        forAllCells(bind(vImageHasCompatibleValue, THRESHOLD))))
 
 
 Result checkAbsenceOfCancellableClosePairs(VolumeData const& candidate)
@@ -158,6 +121,42 @@ Result checkAbsenceOfCancellableClosePairs(VolumeData const& candidate)
     return success();
 }
 
-SIMPLE_TEST_CASE(
-    simplificationLeavesNoCancellableClosePairs,
-    checkWithSimplifiedVolumeData(checkAbsenceOfCancellableClosePairs))
+
+int main()
+{
+    report("the vector field is complete",
+           checkWithSimplifiedVolumeData(
+               forAllCells(vectorDirectionIsDefined)));
+
+    report("no vectors are marked as pointing outward",
+           checkWithSimplifiedVolumeData(
+               forAllCells(vectorIsNotOutwardPointing)));
+
+    report("no vectors are actually pointing outward",
+           checkWithSimplifiedVolumeData(
+               forAllCells(directionIsNotOutwardPointing)));
+
+    report("directions and cell partners match",
+           checkWithSimplifiedVolumeData(
+               forAllCells(cellPartnerMatchesDirection)));
+
+    report("the cell pairing is symmetrical",
+           checkWithSimplifiedVolumeData(
+               forAllCells(partnerOfPartnerIsOriginalCell)));
+
+    report("the discrete vector field is a gradient vector field",
+           checkWithSimplifiedVolumeData(containsNoCyclicVPaths));
+
+    report("original and simplified complex have the same persistent homoloy",
+           checkWithVolumeData(checkOriginalVersusSimplifiedHomology));
+
+    report("vector Field Is Compatible With Scalars",
+           checkWithSimplifiedVolumeData(
+               forAllCells(
+                   bind(vImageHasCompatibleValue, THRESHOLD))));
+
+    report("simplification leaves no cancellable close pairs",
+           checkWithSimplifiedVolumeData(checkAbsenceOfCancellableClosePairs));
+
+    std::cerr << std::endl;
+}

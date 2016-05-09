@@ -1,12 +1,12 @@
 /** -*-c++-*-
  *
- *  Copyright 2014 The Australian National University
+ *  Copyright 2016 The Australian National University
  *
  *  testTraversal.C
  *
  *  Tests vector field traversals and derived algorithms.
  *
- *  Olaf Delgado-Friedrichs jan 14
+ *  Olaf Delgado-Friedrichs may 16
  *
  */
 
@@ -17,13 +17,11 @@
 
 #include "generative.hpp"
 #include "common.hpp"
-#include "booster.hpp"
 
 #include "restricted.hpp"
 
 
 using namespace anu_am::generative;
-using namespace anu_am::generative::booster;
 using namespace anu_am::diamorse;
 
 
@@ -119,10 +117,6 @@ Result criticalCellsAreSelfLabelled(VolumeData const& candidate)
     return success();
 }
 
-SIMPLE_TEST_CASE(
-    criticalCellsAreInExactlyTheirOwnStableOrUnstableSets,
-    checkWithVolumeData(criticalCellsAreSelfLabelled))
-
 
 Result labelsPropagate(
     Labels const& labels,
@@ -150,6 +144,7 @@ Result labelsPropagate(
     }
     return success();
 }
+
 
 Result traversalsAreConsistent(VolumeData const& candidate)
 {
@@ -185,10 +180,6 @@ Result traversalsAreConsistent(VolumeData const& candidate)
     }
     return success();
 }
-
-SIMPLE_TEST_CASE(
-    allStableAndUnstableSetsAreConsistent,
-    checkWithVolumeData(traversalsAreConsistent))
 
 
 Result checkLabelCounts(
@@ -237,21 +228,11 @@ Result checkVertexLabelCounts(VolumeData const& candidate)
 }
 
 
-SIMPLE_TEST_CASE(
-    theBasinsPartitionTheVertexSet,
-    checkWithVolumeData(checkVertexLabelCounts))
-
-
 Result checkMaxCellLabelsCounts(VolumeData const& candidate)
 {
     int const d = candidate.complex.dimension();
     return checkLabelCounts(candidate, d, false, 0, 1);
 }
-
-
-SIMPLE_TEST_CASE(
-    cellsOfMaximumDimensionAreInAtMostOneStableSet,
-    checkWithVolumeData(checkMaxCellLabelsCounts))
 
 
 Result checkMorseBoundaryMethods(VolumeData const& candidate)
@@ -282,10 +263,6 @@ Result checkMorseBoundaryMethods(VolumeData const& candidate)
 
     return success();
 }
-
-SIMPLE_TEST_CASE(
-    theTwoMorseBoundaryAlgorithmsYieldIdenticalResults,
-    checkWithVolumeData(checkMorseBoundaryMethods))
 
 
 Result checkMorseBoundariesUpstreamVersusDownstream(VolumeData const& candidate)
@@ -336,20 +313,12 @@ Result checkMorseBoundariesUpstreamVersusDownstream(VolumeData const& candidate)
     return success();
 }
 
-SIMPLE_TEST_CASE(
-    morseComplexesComputedUpstreamAndDownstreamCoincide,
-    checkWithVolumeData(checkMorseBoundariesUpstreamVersusDownstream))
-
 
 Result checkCubicalVersusChainHomology(VolumeData const& candidate)
 {
     return checkPersistentHomology(convertedCubicalComplex(candidate),
                                    convertedChainComplex(candidate));
 }
-
-SIMPLE_TEST_CASE(
-    cubicalAndChainComplexHaveTheSamePersistentHomoloy,
-    checkWithVolumeData(checkCubicalVersusChainHomology))
 
 
 Result checkConnections(VolumeData const& candidate)
@@ -417,6 +386,32 @@ Result checkConnections(VolumeData const& candidate)
     return success();
 }
 
-SIMPLE_TEST_CASE(
-    connectionsAreConsistent,
-    checkWithVolumeData(checkConnections))
+
+int main()
+{
+    report("critical cells are in exactly their own stable or unstable sets",
+           checkWithVolumeData(criticalCellsAreSelfLabelled));
+
+    report("all stable and unstable sets are consistent",
+           checkWithVolumeData(traversalsAreConsistent));
+
+    report("the basins partition the vertex set",
+           checkWithVolumeData(checkVertexLabelCounts));
+
+    report("cells of maximum dimension are in at most one stable set",
+           checkWithVolumeData(checkMaxCellLabelsCounts));
+
+    report("the two Morse boundary algorithms yield identical results",
+           checkWithVolumeData(checkMorseBoundaryMethods));
+
+    report("Morse complexes computed upstream and downstream coincide",
+           checkWithVolumeData(checkMorseBoundariesUpstreamVersusDownstream));
+
+    report("cubical and chain complex have the same persistent homology",
+           checkWithVolumeData(checkCubicalVersusChainHomology));
+
+    report("connections are consistent",
+           checkWithVolumeData(checkConnections));
+
+    std::cerr << std::endl;
+}

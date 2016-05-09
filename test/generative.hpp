@@ -156,6 +156,21 @@ Result success(std::string const& cause = "")
 }
 
 
+void report(std::string const& name, Result const& result)
+{
+    if (result)
+    {
+        std::cerr << ".";
+    }
+    else
+    {
+        std::cerr << std::endl;
+        std::cerr << "Failed test: " << name << std::endl;
+        std::cerr << result.cause() << std::endl;
+    }
+}
+
+
 template<typename P, typename C, typename S>
 std::pair<C, typename function_traits<P>::result_type>
 shrink(P const& predicate, C const& candidate, S const& shrinker)
