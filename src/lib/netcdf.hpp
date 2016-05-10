@@ -204,11 +204,9 @@ struct TypeTraits<NC_FLOAT>
         Writer &out,
         CType const val)
     {
-        std::vector<uint8_t> tmp(4);
-        IntType *ip = (IntType *) &tmp.at(0);
-        CType   *fp = (CType *) &tmp.at(0);
+        CType tmp[] = { val };
+        IntType *ip = reinterpret_cast<IntType *>(tmp);
 
-        *fp = val;
         TypeTraits<NC_LONG>::write(out, *ip);
     }
 };
