@@ -5,7 +5,14 @@ print '%d.%d' % (sys.version_info.major, sys.version_info.minor)")
 PYTHON_INCL = -I ${PYTHON_PREFIX}/include/python${PYTHON_VERSION}
 NUMPY_INCL  = -I $(shell python -c "import numpy; print numpy.get_include()")
 EXTRA_INCL  = -I ../lib
-CXXOPTS     = -std=c++11 -g -O3 -Wno-cpp
+
+ifeq ($(CXX),c++)
+	CXXWARN = -Wno-\#warnings
+else
+	CXXWARN = -Wno-cpp
+endif
+
+CXXOPTS     = -std=c++11 -g -O3 $(CXXWARN)
 CXXFLAGS    = $(CXXOPTS) $(PYTHON_INCL) $(NUMPY_INCL) $(EXTRA_INCL)
 BINDIR      = ../../bin
 LDFLAGS     = -lpython${PYTHON_VERSION}
