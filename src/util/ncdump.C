@@ -43,7 +43,7 @@ std::string stripname(std::string const path)
     path.copy(s, path.size()+1);
 
     std::string const base = basename(s);
-    delete s;
+    delete[] s;
 
     return base.substr(0, base.rfind("."));
 }

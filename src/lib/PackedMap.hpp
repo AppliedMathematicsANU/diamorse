@@ -73,7 +73,6 @@ public:
     }
 
 private:
-    size_t size_;
     DataItem defaultValue_;
     DataPtr data_;
 
