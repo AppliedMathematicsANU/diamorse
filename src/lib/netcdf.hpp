@@ -192,11 +192,9 @@ struct TypeTraits<NC_FLOAT>
         Buffer const& buffer,
         size_t const offset)
     {
-        std::vector<uint8_t> tmp(4);
-        IntType *ip = (IntType *) &tmp.at(0);
-        CType   *fp = (CType *) &tmp.at(0);
+        IntType tmp[] = { TypeTraits<NC_LONG>::get(buffer, offset) };
+        CType *fp = reinterpret_cast<CType *>(tmp);
 
-        *ip = TypeTraits<NC_LONG>::get(buffer, offset);
         return *fp;
     }
 
@@ -222,21 +220,20 @@ struct TypeTraits<NC_DOUBLE>
         Buffer const& buffer,
         size_t const offset)
     {
-        std::vector<uint8_t> tmp(8);
-        IntType *ip1 = (IntType *) &tmp.at(0);
-        IntType *ip2 = (IntType *) &tmp.at(4);
-        CType   *fp  = (CType *) &tmp.at(0);
+        IntType tmp[] = { 0, 0 };
 
         if (IS_BIG_ENDIAN)
         {
-            *ip1 = TypeTraits<NC_LONG>::get(buffer, offset);
-            *ip2 = TypeTraits<NC_LONG>::get(buffer, offset+4);
+            tmp[0] = TypeTraits<NC_LONG>::get(buffer, offset);
+            tmp[1] = TypeTraits<NC_LONG>::get(buffer, offset+4);
         }
         else
         {
-            *ip1 = TypeTraits<NC_LONG>::get(buffer, offset+4);
-            *ip2 = TypeTraits<NC_LONG>::get(buffer, offset);
+            tmp[0] = TypeTraits<NC_LONG>::get(buffer, offset+4);
+            tmp[1] = TypeTraits<NC_LONG>::get(buffer, offset);
         }
+
+        CType *fp = reinterpret_cast<CType *>(tmp);
 
         return *fp;
     }
@@ -245,22 +242,18 @@ struct TypeTraits<NC_DOUBLE>
         Writer &out,
         CType const val)
     {
-        std::vector<uint8_t> tmp(8);
-        IntType *ip1 = (IntType *) &tmp.at(0);
-        IntType *ip2 = (IntType *) &tmp.at(4);
-        CType   *fp  = (CType *) &tmp.at(0);
-
-        *fp = val;
+        CType tmp[] = { val };
+        IntType *ip = reinterpret_cast<IntType *>(tmp);
 
         if (IS_BIG_ENDIAN)
         {
-            TypeTraits<NC_LONG>::write(out, *ip1);
-            TypeTraits<NC_LONG>::write(out, *ip2);
+            TypeTraits<NC_LONG>::write(out, ip[0]);
+            TypeTraits<NC_LONG>::write(out, ip[1]);
         }
         else
         {
-            TypeTraits<NC_LONG>::write(out, *ip2);
-            TypeTraits<NC_LONG>::write(out, *ip1);
+            TypeTraits<NC_LONG>::write(out, ip[1]);
+            TypeTraits<NC_LONG>::write(out, ip[0]);
         }
     }
 };
