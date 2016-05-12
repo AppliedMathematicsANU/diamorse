@@ -49,14 +49,22 @@ std::string stripname(std::string const path)
 }
 
 
-std::string formatString(std::string const input)
+std::string formatValues(Attribute const a)
 {
-    std::string s(input);
-    s = replaceAll(s, '\\', "\\\\");
-    s = replaceAll(s, '\"', "\\\"");
-    s = replaceAll(s, '\n', "\\n\",\n\t\t\t\"");
+    if (a.type() == NC_CHAR)
+    {
+        std::string s = a.valuesAsString();
 
-    return "\"" + s + "\"";
+        s = replaceAll(s, '\\', "\\\\");
+        s = replaceAll(s, '\"', "\\\"");
+        s = replaceAll(s, '\n', "\\n\",\n\t\t\t\"");
+
+        return "\"" + s + "\"";
+    }
+    else
+    {
+        return a.valuesAsString();
+    }
 }
 
 
@@ -102,7 +110,7 @@ int main(int argc, char* argv[])
         {
             Attribute a = attrs.at(j);
             std::cout << "\t\t" << v.name() << ":" << attrs.keyAt(j) << " = "
-                      << formatString(a.valuesAsString())
+                      << formatValues(a)
                       << " ;" << std::endl;
         }
     }
@@ -113,7 +121,7 @@ int main(int argc, char* argv[])
     {
         Attribute a = attrs.at(i);
         std::cout << "\t\t:" << attrs.keyAt(i) << " = "
-                  << formatString(a.valuesAsString())
+                  << formatValues(a)
                   << " ;" << std::endl;
     }
     std::cout << std::endl;
