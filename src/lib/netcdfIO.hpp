@@ -17,7 +17,7 @@
 #include <fstream>
 #include <stdexcept>
 
-#include "boost/smart_ptr.hpp"
+#include <memory>
 
 
 namespace anu_am
@@ -29,7 +29,7 @@ class FileBuffer
 {
     typedef std::vector<uint8_t> Data;
 
-    boost::shared_ptr<Data> _data;
+    std::shared_ptr<Data> _data;
 
     Data* contents(std::string const path)
     {
@@ -77,7 +77,7 @@ struct Writer
 
 class FileWriter
 {
-    boost::shared_ptr<std::ofstream> _file;
+    std::shared_ptr<std::ofstream> _file;
 
 public:
     FileWriter() {}

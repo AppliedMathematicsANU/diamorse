@@ -36,7 +36,7 @@ void extract(
     std::vector<size_t> dims = readDimensions(info);
     size_t const n = dims.at(0) * dims.at(1) * dims.at(2);
 
-    boost::shared_ptr<std::vector<T> > const data = readVolumeData<T>(inpath);
+    std::shared_ptr<std::vector<T> > const data = readVolumeData<T>(inpath);
 
     // Do the processing.
     for (size_t k = 0; k < n; ++k)

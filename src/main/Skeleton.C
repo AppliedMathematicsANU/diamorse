@@ -10,6 +10,7 @@
  *
  */
 
+#include <getopt.h>
 #include <stdint.h>
 
 #include "CubicalComplex.hpp"

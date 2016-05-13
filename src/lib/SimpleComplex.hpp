@@ -15,7 +15,7 @@
 
 #include <vector>
 
-#include "boost/smart_ptr.hpp"
+#include <memory>
 
 namespace anu_am
 {
@@ -31,9 +31,9 @@ public:
 private:
     typedef cell_id_type Cell;
 
-    boost::shared_ptr<std::vector<unsigned int> >       dims_;
-    boost::shared_ptr<std::vector<float> >              scalars_;
-    boost::shared_ptr<std::vector<std::vector<Cell> > > faceLists_;
+    std::shared_ptr<std::vector<unsigned int> >       dims_;
+    std::shared_ptr<std::vector<float> >              scalars_;
+    std::shared_ptr<std::vector<std::vector<Cell> > > faceLists_;
 
 public:
     SimpleComplex() {}

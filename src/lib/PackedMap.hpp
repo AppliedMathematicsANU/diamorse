@@ -16,7 +16,7 @@
 #include <stdint.h>
 #include <vector>
 
-#include "boost/smart_ptr.hpp"
+#include <memory>
 
 namespace anu_am
 {
@@ -31,7 +31,7 @@ class PackedMap
 
 public:
     typedef Value value_type;
-    typedef boost::shared_ptr<std::vector<DataItem> > DataPtr;
+    typedef std::shared_ptr<std::vector<DataItem> > DataPtr;
 
     PackedMap()
     {
@@ -73,7 +73,6 @@ public:
     }
 
 private:
-    size_t size_;
     DataItem defaultValue_;
     DataPtr data_;
 

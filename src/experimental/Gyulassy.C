@@ -17,7 +17,7 @@
 #include <vector>
 #include <utility>
 
-#include "boost/smart_ptr.hpp"
+#include <memory>
 
 #include "collections.hpp"
 #include "CubicalComplex.hpp"
@@ -52,7 +52,7 @@ struct VertexInfo
     }
 };
 
-typedef boost::shared_ptr<VertexInfo> InfoPtr;
+typedef std::shared_ptr<VertexInfo> InfoPtr;
 typedef VertexMap<CubicalComplex, InfoPtr> InfoMap;
 
 
@@ -221,7 +221,6 @@ Mask boundaries(
         {
             queue.push(v, scalars(v) + 1);
             info.set(v, InfoPtr(new VertexInfo()));
-            result.set(v, 2);
         }
     }
 
@@ -252,6 +251,7 @@ Mask boundaries(
             info(v)->weights = Distribution(1);
             info(v)->weights.at(0) = std::make_pair(v, 1);
             info(v)->basin = v;
+            result.set(v, 2);
         }
         else
         {

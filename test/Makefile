@@ -1,17 +1,10 @@
-UNAME := $(shell uname)
-
-CXXWARN  = -Wall -Wextra -ansi -pedantic
+CXXSTD   = -std=c++11
+CXXWARN  = -Wall -Wextra -pedantic
 CXXOPTIM = -O3
 CXXDEBUG = -g
 CXXLIBS  = -I ../src/lib
-CXXFLAGS = $(CXXWARN) $(CXXDEBUG) $(CXXOPTIM) $(CXXLIBS)
+CXXFLAGS = $(CXXSTD) $(CXXWARN) $(CXXDEBUG) $(CXXOPTIM) $(CXXLIBS)
 BINDIR   = bin
-
-ifeq ($(UNAME), Darwin)
-LDFLAGS  = -lboost_unit_test_framework-mt
-else
-LDFLAGS  = -lboost_unit_test_framework
-endif
 
 MAKEDEPEND= $(CXX) $(CXXFLAGS) -MM -MP -MT $(BINDIR)/$* -o $*.P $<
 
@@ -19,7 +12,7 @@ MAKEDEPEND= $(CXX) $(CXXFLAGS) -MM -MP -MT $(BINDIR)/$* -o $*.P $<
 
 $(BINDIR)/% : %.C
 	@$(MAKEDEPEND);
-	$(CXX) $(CXXFLAGS) $< -o $@ $(LDFLAGS)
+	$(CXX) $(CXXFLAGS) $< -o $@
 
 
 SRCS := $(wildcard *.C)

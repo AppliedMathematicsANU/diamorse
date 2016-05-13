@@ -1,12 +1,21 @@
-UNAME := $(shell uname)
+PYTHON_PREFIX  = $(shell python -c "import sys; print sys.prefix")
+PYTHON_VERSION = $(shell python -c "import sys;\
+print '%d.%d' % (sys.version_info.major, sys.version_info.minor)")
 
-PYTHON_INCL = -I /usr/include/python2.7
+PYTHON_INCL = -I ${PYTHON_PREFIX}/include/python${PYTHON_VERSION}
 NUMPY_INCL  = -I $(shell python -c "import numpy; print numpy.get_include()")
 EXTRA_INCL  = -I ../lib
-CXXOPTS     = -ansi -g -O3 -Wno-cpp
+
+ifeq ($(CXX),c++)
+	CXXWARN = -Wno-\#warnings
+else
+	CXXWARN = -Wno-cpp
+endif
+
+CXXOPTS     = -std=c++11 -g -O3 $(CXXWARN)
 CXXFLAGS    = $(CXXOPTS) $(PYTHON_INCL) $(NUMPY_INCL) $(EXTRA_INCL)
 BINDIR      = ../../bin
-LDFLAGS     = -lpython2.7
+LDFLAGS     = -lpython${PYTHON_VERSION}
 
 MAKEDEPEND  = $(CXX) $(CXXFLAGS) -MM -MP -MT $(BINDIR)/$*.so -o $*.P $<
 

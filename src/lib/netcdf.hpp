@@ -21,7 +21,7 @@
 #include <string>
 #include <vector>
 
-#include "boost/smart_ptr.hpp"
+#include <memory>
 
 #include "OrderedMap.hpp"
 
@@ -192,11 +192,9 @@ struct TypeTraits<NC_FLOAT>
         Buffer const& buffer,
         size_t const offset)
     {
-        std::vector<uint8_t> tmp(4);
-        IntType *ip = (IntType *) &tmp.at(0);
-        CType   *fp = (CType *) &tmp.at(0);
+        IntType tmp[] = { TypeTraits<NC_LONG>::get(buffer, offset) };
+        CType *fp = reinterpret_cast<CType *>(tmp);
 
-        *ip = TypeTraits<NC_LONG>::get(buffer, offset);
         return *fp;
     }
 
@@ -204,11 +202,9 @@ struct TypeTraits<NC_FLOAT>
         Writer &out,
         CType const val)
     {
-        std::vector<uint8_t> tmp(4);
-        IntType *ip = (IntType *) &tmp.at(0);
-        CType   *fp = (CType *) &tmp.at(0);
+        CType tmp[] = { val };
+        IntType *ip = reinterpret_cast<IntType *>(tmp);
 
-        *fp = val;
         TypeTraits<NC_LONG>::write(out, *ip);
     }
 };
@@ -224,21 +220,20 @@ struct TypeTraits<NC_DOUBLE>
         Buffer const& buffer,
         size_t const offset)
     {
-        std::vector<uint8_t> tmp(8);
-        IntType *ip1 = (IntType *) &tmp.at(0);
-        IntType *ip2 = (IntType *) &tmp.at(4);
-        CType   *fp  = (CType *) &tmp.at(0);
+        IntType tmp[] = { 0, 0 };
 
         if (IS_BIG_ENDIAN)
         {
-            *ip1 = TypeTraits<NC_LONG>::get(buffer, offset);
-            *ip2 = TypeTraits<NC_LONG>::get(buffer, offset+4);
+            tmp[0] = TypeTraits<NC_LONG>::get(buffer, offset);
+            tmp[1] = TypeTraits<NC_LONG>::get(buffer, offset+4);
         }
         else
         {
-            *ip1 = TypeTraits<NC_LONG>::get(buffer, offset+4);
-            *ip2 = TypeTraits<NC_LONG>::get(buffer, offset);
+            tmp[0] = TypeTraits<NC_LONG>::get(buffer, offset+4);
+            tmp[1] = TypeTraits<NC_LONG>::get(buffer, offset);
         }
+
+        CType *fp = reinterpret_cast<CType *>(tmp);
 
         return *fp;
     }
@@ -247,22 +242,18 @@ struct TypeTraits<NC_DOUBLE>
         Writer &out,
         CType const val)
     {
-        std::vector<uint8_t> tmp(8);
-        IntType *ip1 = (IntType *) &tmp.at(0);
-        IntType *ip2 = (IntType *) &tmp.at(4);
-        CType   *fp  = (CType *) &tmp.at(0);
-
-        *fp = val;
+        CType tmp[] = { val };
+        IntType *ip = reinterpret_cast<IntType *>(tmp);
 
         if (IS_BIG_ENDIAN)
         {
-            TypeTraits<NC_LONG>::write(out, *ip1);
-            TypeTraits<NC_LONG>::write(out, *ip2);
+            TypeTraits<NC_LONG>::write(out, ip[0]);
+            TypeTraits<NC_LONG>::write(out, ip[1]);
         }
         else
         {
-            TypeTraits<NC_LONG>::write(out, *ip2);
-            TypeTraits<NC_LONG>::write(out, *ip1);
+            TypeTraits<NC_LONG>::write(out, ip[1]);
+            TypeTraits<NC_LONG>::write(out, ip[0]);
         }
     }
 };
@@ -398,15 +389,15 @@ struct TypedAttrImpl : public AttrImpl
 
 
 template<typename T>
-boost::shared_ptr<AttrImpl> makeImpl(std::vector<T> const& values)
+std::shared_ptr<AttrImpl> makeImpl(std::vector<T> const& values)
 {
-    return boost::shared_ptr<AttrImpl>(
+    return std::shared_ptr<AttrImpl>(
         new TypedAttrImpl<InverseTraits<T>::type>(values));
 }
 
 
 template<>
-boost::shared_ptr<AttrImpl> makeImpl<char>(std::vector<char> const& text)
+std::shared_ptr<AttrImpl> makeImpl<char>(std::vector<char> const& text)
 {
     std::vector<uint8_t> values(text.begin(), text.end());
     return makeImpl(values);
@@ -414,7 +405,7 @@ boost::shared_ptr<AttrImpl> makeImpl<char>(std::vector<char> const& text)
 
 
 template<>
-boost::shared_ptr<AttrImpl> makeImpl<size_t>(std::vector<size_t> const& values)
+std::shared_ptr<AttrImpl> makeImpl<size_t>(std::vector<size_t> const& values)
 {
     std::vector<int32_t> const converted(values.begin(), values.end());
     return makeImpl(converted);
@@ -422,7 +413,7 @@ boost::shared_ptr<AttrImpl> makeImpl<size_t>(std::vector<size_t> const& values)
 
 
 template<>
-boost::shared_ptr<AttrImpl> makeImpl<uint32_t>(std::vector<uint32_t> const& values)
+std::shared_ptr<AttrImpl> makeImpl<uint32_t>(std::vector<uint32_t> const& values)
 {
     std::vector<int32_t> const converted(values.begin(), values.end());
     return makeImpl(converted);
@@ -430,7 +421,7 @@ boost::shared_ptr<AttrImpl> makeImpl<uint32_t>(std::vector<uint32_t> const& valu
 
 
 template<typename T, size_t N>
-boost::shared_ptr<AttrImpl> makeImpl(T const(&a)[N])
+std::shared_ptr<AttrImpl> makeImpl(T const(&a)[N])
 {
     std::vector<T> values(a, a + N);
 
@@ -439,7 +430,7 @@ boost::shared_ptr<AttrImpl> makeImpl(T const(&a)[N])
 
 
 template<typename T>
-boost::shared_ptr<AttrImpl> makeImpl(T const value)
+std::shared_ptr<AttrImpl> makeImpl(T const value)
 {
     std::vector<T> values;
     values.push_back(value);
@@ -449,7 +440,7 @@ boost::shared_ptr<AttrImpl> makeImpl(T const value)
 
 
 template<typename T>
-boost::shared_ptr<AttrImpl> makeImpl(T const v1, T const v2)
+std::shared_ptr<AttrImpl> makeImpl(T const v1, T const v2)
 {
     std::vector<T> values;
     values.push_back(v1);
@@ -460,7 +451,7 @@ boost::shared_ptr<AttrImpl> makeImpl(T const v1, T const v2)
 
 
 template<>
-boost::shared_ptr<AttrImpl> makeImpl<std::string>(std::string const text)
+std::shared_ptr<AttrImpl> makeImpl<std::string>(std::string const text)
 {
     std::vector<uint8_t> values(text.begin(), text.end());
     return makeImpl(values);
@@ -469,7 +460,7 @@ boost::shared_ptr<AttrImpl> makeImpl<std::string>(std::string const text)
 
 class Attribute
 {
-    boost::shared_ptr<AttrImpl> _impl;
+    std::shared_ptr<AttrImpl> _impl;
 
 public:
     Attribute()
@@ -1026,7 +1017,7 @@ public:
 class Accessor
 {
 public:
-    typedef boost::shared_ptr<AccImpl> ImplPtr;
+    typedef std::shared_ptr<AccImpl> ImplPtr;
 
 private:
     ImplPtr _impl;
@@ -1064,7 +1055,7 @@ Accessor makeAccessor(
     size_t const start)
 {
     AccImpl *acc = new BufferAccImpl<NCType, Buffer>(dims, buf, start);
-    return Accessor(boost::shared_ptr<AccImpl>(acc));
+    return Accessor(std::shared_ptr<AccImpl>(acc));
 }
 
 

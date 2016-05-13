@@ -6,20 +6,20 @@
  *
  *  Prints the header of a NetCDF 3 file in a CDL-like format.
  *
- *  Olaf Delgado-Friedrichs jan 15
+ *  Olaf Delgado-Friedrichs may 16
  *
  */
 
 #include <libgen.h>
 
-#include "boost/algorithm/string.hpp"
-
 #include "collections.hpp"
 #include "netcdf.hpp"
 #include "netcdfIO.hpp"
+#include "stringUtils.hpp"
 
 using namespace anu_am::netcdf;
 using namespace anu_am::diamorse;
+using namespace anu_am::stringutils;
 
 
 std::string tname(Tag const type)
@@ -40,23 +40,31 @@ std::string tname(Tag const type)
 std::string stripname(std::string const path)
 {
     char *s = new char[path.size()+1];
-    strncpy(s, path.c_str(), path.size()+1);
+    path.copy(s, path.size()+1);
 
     std::string const base = basename(s);
-    delete s;
+    delete[] s;
 
     return base.substr(0, base.rfind("."));
 }
 
 
-std::string formatString(std::string const input)
+std::string formatValues(Attribute const a)
 {
-    std::string s(input);
-    boost::replace_all(s, "\\", "\\\\");
-    boost::replace_all(s, "\"", "\\\"");
-    boost::replace_all(s, "\n", "\\n\",\n\t\t\t\"");
+    if (a.type() == NC_CHAR)
+    {
+        std::string s = a.valuesAsString();
 
-    return "\"" + s + "\"";
+        s = replaceAll(s, '\\', "\\\\");
+        s = replaceAll(s, '\"', "\\\"");
+        s = replaceAll(s, '\n', "\\n\",\n\t\t\t\"");
+
+        return "\"" + s + "\"";
+    }
+    else
+    {
+        return a.valuesAsString();
+    }
 }
 
 
@@ -102,7 +110,7 @@ int main(int argc, char* argv[])
         {
             Attribute a = attrs.at(j);
             std::cout << "\t\t" << v.name() << ":" << attrs.keyAt(j) << " = "
-                      << formatString(a.valuesAsString())
+                      << formatValues(a)
                       << " ;" << std::endl;
         }
     }
@@ -113,7 +121,7 @@ int main(int argc, char* argv[])
     {
         Attribute a = attrs.at(i);
         std::cout << "\t\t:" << attrs.keyAt(i) << " = "
-                  << formatString(a.valuesAsString())
+                  << formatValues(a)
                   << " ;" << std::endl;
     }
     std::cout << std::endl;

@@ -15,7 +15,7 @@
 
 #include <vector>
 
-#include "boost/smart_ptr.hpp"
+#include <memory>
 
 #include "CubicalComplex.hpp"
 

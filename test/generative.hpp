@@ -1,12 +1,12 @@
 /** -*-c++-*-
  *
- *  Copyright 2014 The Australian National University
+ *  Copyright 2016 The Australian National University
  *
  *  generative.hpp
  *
  *  A simple generative testing framework inspired by Haskell's QuickCheck.
  *
- *  Olaf Delgado-Friedrichs jan 14
+ *  Olaf Delgado-Friedrichs may 16
  *
  */
 
@@ -15,38 +15,27 @@
 #define ANU_AM_GENERATIVE_HPP
 
 #include <iostream>
+#include <random>
 #include <sstream>
 #include <vector>
 
-#include <boost/random/mersenne_twister.hpp>
-#include <boost/random/uniform_int.hpp>
-#include <boost/random/normal_distribution.hpp>
-#include <boost/random/variate_generator.hpp>
 
 namespace anu_am
 {
 namespace generative
 {
 
-typedef boost::mt19937 RandomNumberGenerator;
-RandomNumberGenerator rng(time(0));
-
-
-template<class T, class D>
-T random(D const& d)
-{
-    return boost::variate_generator<boost::mt19937&, D>(rng, d)();
-}
+std::mt19937 rng(time(0));
 
 
 float randomFloat(float const sigma = 5.0, float const mean = 0.0)
 {
-    return random<float>(boost::normal_distribution<float>(mean, sigma));
+    return std::normal_distribution<float>(mean, sigma)(rng);
 }
 
 int randomInt(int const limit)
 {
-    return random<int>(boost::uniform_int<>(0, limit));
+    return std::uniform_int_distribution<>(0, limit)(rng);
 }
 
 
@@ -164,6 +153,21 @@ Result failure(std::string const& cause)
 Result success(std::string const& cause = "")
 {
     return Result(true, cause);
+}
+
+
+void report(std::string const& name, Result const& result)
+{
+    if (result)
+    {
+        std::cerr << ".";
+    }
+    else
+    {
+        std::cerr << std::endl;
+        std::cerr << "Failed test: " << name << std::endl;
+        std::cerr << result.cause() << std::endl;
+    }
 }
 
 

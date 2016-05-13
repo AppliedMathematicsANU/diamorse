@@ -10,6 +10,7 @@
  *
  */
 
+#include <getopt.h>
 #include <stdint.h>
 #include <stdlib.h>
 
@@ -89,10 +90,10 @@ void extract(
     size_t const ymax = stop(yrange, ydim);
     size_t const zmax = stop(zrange, zdim);
 
-    boost::shared_ptr<std::vector<T> > const data = readVolumeData<T>(inpath);
+    std::shared_ptr<std::vector<T> > const data = readVolumeData<T>(inpath);
 
     // Do the processing.
-    boost::shared_ptr<std::vector<T> > const
+    std::shared_ptr<std::vector<T> > const
         output(new std::vector<T>(xsize * ysize * zsize));
 
     size_t k = 0;

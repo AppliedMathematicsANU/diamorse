@@ -1,12 +1,12 @@
 /** -*-c++-*-
  *
- *  Copyright 2014 The Australian National University
+ *  Copyright 2016 The Australian National University
  *
  *  testPartition.C
  *
  *  Tests the Partition (union-find) class.
  *
- *  Olaf Delgado-Friedrichs mar 14
+ *  Olaf Delgado-Friedrichs may 16
  *
  */
 
@@ -19,14 +19,12 @@
 #include <vector>
 
 #include "generative.hpp"
-#include "booster.hpp"
 
 #include "collections.hpp"
 #include "Partition.hpp"
 
 
 using namespace anu_am::generative;
-using namespace anu_am::generative::booster;
 using namespace anu_am::diamorse;
 
 
@@ -225,4 +223,9 @@ Result checkPartition()
 }
 
 
-SIMPLE_TEST_CASE(partitionsWorkProperly, checkPartition<uint16_t>())
+int main()
+{
+    report("partitions work properly", checkPartition<uint16_t>());
+
+    std::cerr << std::endl;
+}
