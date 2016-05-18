@@ -214,8 +214,8 @@ def plot(data, options):
                     options.maxima_color, options.maxima_alpha)
 
     d = options.padding + 0.5
-    plt.xlim([-d, scalars.shape[0] + d - 1])
-    plt.ylim([-d, scalars.shape[1] + d - 1])
+    plt.xlim([-d, scalars.shape[1] + d - 1])
+    plt.ylim([-d, scalars.shape[0] + d - 1])
 
     ax.get_xaxis().set_major_locator(MultipleLocator(50))
     ax.get_xaxis().set_major_formatter(FormatStrFormatter('%d'))
