@@ -29,6 +29,7 @@ MAKEDEPEND  = $(CXX) $(CXXFLAGS) -MM -MP -MT $(BINDIR)/$*.so -o $*.P $<
 $(BINDIR)/%.so : %.cpp
 	@$(MAKEDEPEND)
 	$(CXX) $(CXXFLAGS) --shared -fPIC $< -o $@ $(LDFLAGS)
+	(cd ../../python && ln -nsf ../bin/$*.so .)
 
 
 SRCS := $(wildcard *.pyx)
