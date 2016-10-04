@@ -139,7 +139,7 @@ def printStats(pairs):
         for x in reversed(sorted(counts.keys())):
             cum += counts[x]
             counts[x] = cum
-        
+
         print ("# Numbers of cells of dimension " + str(d) +
                " by lower persistence thresholds")
         for x in sorted(counts.keys()):
@@ -169,6 +169,8 @@ if __name__ == '__main__':
         parser.error("expected at least one argument")
 
     infile = args[0]
+
+    threshold = options.threshold
 
     if infile.endswith(".nc") or infile.endswith("_nc"):
         pairs = fromVolumeFile(infile, options)
