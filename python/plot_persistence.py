@@ -64,19 +64,11 @@ if __name__ == '__main__':
                         help = 'simplification threshold (default 1.0)')
     parser.add_argument('-d', '--dimensions',
                         type = int, default = 3,
-                        help = 'number of dimensions (default 3)')
-    parser.add_argument("-b", "--betti", dest = "betti", default = False,
-                        action = "store_true", help = "output Betti numbers")
-    parser.add_argument("-r", "--raw", dest = "raw", default = False,
-                        action = "store_true", help = "output persistence pairs")
-    parser.add_argument("-s", "--stats", dest = "stats", default = False,
-                        action = "store_true", help = "output some statistics")
+                        help = 'kind of critical points to show. E.g. 0 is for minima vs. 1-saddle point (default 2, 2-saddle point vs maxima)')
     args = parser.parse_args()
     infile = args.infile
     threshold = args.threshold
     dim = args.dimensions
-
-    
 
     if infile.endswith(".nc") or infile.endswith("_nc"):
         pairs = persistence.fromVolumeFile(infile, args)
