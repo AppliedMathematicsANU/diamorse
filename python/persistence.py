@@ -139,7 +139,7 @@ def printStats(pairs):
         for x in reversed(sorted(counts.keys())):
             cum += counts[x]
             counts[x] = cum
-        
+
         print ("# Numbers of cells of dimension " + str(d) +
                " by lower persistence thresholds")
         for x in sorted(counts.keys()):
@@ -148,27 +148,27 @@ def printStats(pairs):
 
 
 if __name__ == '__main__':
-    import optparse
+    import argparse
     from collections import defaultdict
 
-    parser = optparse.OptionParser("usage: %prog [OPTIONS] INFILE")
-    parser.add_option('-f', '--field', dest = 'field', metavar = 'FILE',
+    parser = argparse.ArgumentParser("usage: %prog [OPTIONS] INFILE")
+    parser.add_argument('infile', help='file containing the field')
+    parser.add_argument('-f', '--field', dest = 'field', metavar = 'FILE',
                       default = '',
                       help = 'file containing a pre-computed vector field')
-    parser.add_option('-t', '--threshold', dest = 'threshold', metavar = 'X',
-                      type = 'float', default = 1.0,
+    parser.add_argument('-t', '--threshold', dest = 'threshold', metavar = 'X',
+                      type = float, default = 1.0,
                       help = 'simplification threshold (default 1.0)')
-    parser.add_option("-b", "--betti", dest = "betti", default = False,
+    parser.add_argument("-b", "--betti", dest = "betti", default = False,
                       action = "store_true", help = "output Betti numbers")
-    parser.add_option("-r", "--raw", dest = "raw", default = False,
+    parser.add_argument("-r", "--raw", dest = "raw", default = False,
                       action = "store_true", help = "output persistence pairs")
-    parser.add_option("-s", "--stats", dest = "stats", default = False,
+    parser.add_argument("-s", "--stats", dest = "stats", default = False,
                       action = "store_true", help = "output some statistics")
-    (options, args) = parser.parse_args()
-    if len(args) < 1:
-        parser.error("expected at least one argument")
+    options = parser.parse_args()
 
-    infile = args[0]
+    infile = options.infile
+    threshold = options.threshold
 
     if infile.endswith(".nc") or infile.endswith("_nc"):
         pairs = fromVolumeFile(infile, options)

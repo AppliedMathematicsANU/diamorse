@@ -53,11 +53,27 @@ def deathsVersusBirthsHistogram(pairs, dim, threshold, nbins=100):
 if __name__ == '__main__':
     import sys, os.path
 
-    infile = sys.argv[1]
-    threshold = float(sys.argv[2])
-    dim = int(sys.argv[3])
+    import argparse
+    parser = argparse.ArgumentParser(description='Process and plot.')
+    parser.add_argument('infile', help='file containing the field')
+    parser.add_argument('-f', '--field', metavar = 'FILE',
+                        default = '',
+                        help = 'file containing a pre-computed vector field')
+    parser.add_argument('-t', '--threshold', metavar = 'X',
+                        type = float, default = 1.0,
+                        help = 'simplification threshold (default 1.0)')
+    parser.add_argument('-d', '--dimensions',
+                        type = int, default = 3,
+                        help = 'kind of critical points to show. E.g. 0 is for minima vs. 1-saddle point (default 2, 2-saddle point vs maxima)')
+    args = parser.parse_args()
+    infile = args.infile
+    threshold = args.threshold
+    dim = args.dimensions
 
-    pairs = persistence.fromTextFile(infile)
+    if infile.endswith(".nc") or infile.endswith("_nc"):
+        pairs = persistence.fromVolumeFile(infile, args)
+    else:
+        pairs = fromTextFile(infile)
 
     plt.figure(1)
     plt.title('Cycle births and deaths, t = %.2f, d = %d' % (threshold, dim))
