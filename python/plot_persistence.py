@@ -73,7 +73,7 @@ if __name__ == '__main__':
     if infile.endswith(".nc") or infile.endswith("_nc"):
         pairs = persistence.fromVolumeFile(infile, args)
     else:
-        pairs = fromTextFile(infile)
+        pairs = persistence.fromTextFile(infile)
 
     plt.figure(1)
     plt.title('Cycle births and deaths, t = %.2f, d = %d' % (threshold, dim))
