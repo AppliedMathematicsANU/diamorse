@@ -203,14 +203,21 @@ int main(int argc, char* argv[])
         ss << "   " << dim << "   " <<  val << "   " << p << "  ";
 
         std::vector<std::pair<Cell, int> > bnd = chains.at(cell);
+        std::vector<size_t> bndIdcs;
+
         for (size_t i = 0; i < bnd.size(); ++i)
         {
             Cell const other = bnd.at(i).first;
             int const count = bnd.at(i).second;
 
             for (int j = 0; j < count; ++j)
-                ss << " " << cellIndex.at(other);
+                bndIdcs.push_back(cellIndex.at(other));
         }
+
+        std::stable_sort(bndIdcs.begin(), bndIdcs.end());
+        for (size_t i = 0; i < bndIdcs.size(); ++i)
+            ss << " " << bndIdcs.at(i);
+
         ss << std::endl;
     }
 
@@ -226,7 +233,9 @@ int main(int argc, char* argv[])
         (parentID)
         (guessDatasetID(scalarPath, readFileInfo(scalarPath).attributes()));
 
-    js::Object const parameters = js::Object("threshold" , threshold);
+    js::Object const parameters = js::Object
+        ("threshold" , threshold)
+        ("dimension", dimension);
 
     js::Object const description = js::Object
         ("id"          , thisID)
