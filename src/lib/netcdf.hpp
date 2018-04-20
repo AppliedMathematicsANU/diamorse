@@ -829,7 +829,21 @@ public:
 
     Header readHeader() {
         std::vector<uint8_t> const magic = read<NC_CHAR>(4);
-        assert(std::string(magic.begin(), magic.end()) == "CDF\x1");
+        std::string s(magic.begin(), magic.end());
+
+        if (s != "CDF\x1")
+        {
+            std::string format;
+            if (s == "CDF\x2")
+                format = "NetCDF-3 64-bit";
+            else if (s == "\x89HDF")
+                format = "HDF5/NetCDF-4";
+            else
+                format = "unknown";
+
+            throw std::runtime_error("expected classic NetCDF-3 format, got "
+                                     + format);
+        }
 
         size_t const nrRecords = readNonNegative();
         std::vector<Dimension> const dimensions = readDimensions();
