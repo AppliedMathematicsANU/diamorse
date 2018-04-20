@@ -15,7 +15,6 @@
 #include <stdint.h>
 #include <sstream>
 
-#include "collections.hpp"
 #include "chainComplexExtraction.hpp"
 #include "CubicalComplex.hpp"
 #include "json.hpp"
@@ -49,6 +48,17 @@ void printWithPrefix(
     }
     if (pos < text.size())
         out << prefix << text.substr(pos) << std::endl;
+}
+
+
+template<typename T>
+std::ostream& operator<<(std::ostream& out, std::vector<T> const& v)
+{
+    out << std::fixed << std::setprecision(1);
+
+    for (size_t i = 0; i < v.size(); ++i)
+        out << (i > 0 ? " " : "") << std::setw(6) << v.at(i);
+    return out;
 }
 
 
@@ -199,8 +209,9 @@ int main(int argc, char* argv[])
         int const dim = complex.cellDimension(cell);
         Value const val = cellValue(cell, scalars, vertices);
         
-        ss << cellIndex.at(cell);
-        ss << "   " << dim << "   " <<  val << "   " << p << "  ";
+        ss << std::setw(8) << cellIndex.at(cell) << "   " << dim << "   ";
+        ss << std::fixed << std::setprecision(6);
+        ss << std::setw(12) << val << "   " << p << "  ";
 
         std::vector<std::pair<Cell, int> > bnd = chains.at(cell);
         std::vector<size_t> bndIdcs;
@@ -216,7 +227,7 @@ int main(int argc, char* argv[])
 
         std::stable_sort(bndIdcs.begin(), bndIdcs.end());
         for (size_t i = 0; i < bndIdcs.size(); ++i)
-            ss << " " << bndIdcs.at(i);
+            ss << " " << std::setw(4) << bndIdcs.at(i);
 
         ss << std::endl;
     }
