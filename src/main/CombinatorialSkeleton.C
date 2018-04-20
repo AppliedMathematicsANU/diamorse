@@ -20,7 +20,6 @@
 #include "json.hpp"
 #include "MorseVectorField.hpp"
 #include "PackedMap.hpp"
-#include "traversals.hpp"
 #include "VertexMap.hpp"
 #include "volume_io.hpp"
 
@@ -245,7 +244,7 @@ int main(int argc, char* argv[])
         (guessDatasetID(scalarPath, readFileInfo(scalarPath).attributes()));
 
     js::Object const parameters = js::Object
-        ("threshold" , threshold)
+        ("threshold", threshold)
         ("dimension", dimension);
 
     js::Object const description = js::Object
