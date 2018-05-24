@@ -32,6 +32,67 @@ typedef MorseVectorField<PackedMap> Field;
 typedef Field::DataPtr::element_type::value_type FieldItem;
 
 
+Value cellValue(Cell const v, Scalars const scalars, Vertices const vertices)
+{
+    Value val = scalars.get(vertices(v, 0));
+    for (size_t i = 1; i < (size_t) vertices.count(v); ++i)
+        val = std::max(val, scalars.get(vertices(v, i)));
+
+    return val;
+}
+
+
+struct Comparator
+{
+    Comparator(CubicalComplex const& complex, Scalars const& scalars)
+        : _complex(complex),
+          _vertices(complex.xdim(), complex.ydim(), complex.zdim()),
+          _scalars(scalars)
+    {
+    }
+
+    bool operator()(Cell const v, Cell const w)
+    {
+        size_t const dv = _complex.cellDimension(v);
+        size_t const dw = _complex.cellDimension(w);
+        Value const sv = cellValue(v, _scalars, _vertices);
+        Value const sw = cellValue(w, _scalars, _vertices);
+
+        return dv < dw or (dv == dw and sv < sw);
+    }
+
+private:
+    CubicalComplex const& _complex;
+    Vertices const _vertices;
+    Scalars const& _scalars;
+};
+
+
+std::vector<Cell> criticalCellsSorted(
+    CubicalComplex const& complex,
+    Scalars const& scalars,
+    Field const& field,
+    float const threshold,
+    int const dimension)
+{
+    Vertices vertices(complex.xdim(), complex.ydim(), complex.zdim());
+    std::vector<Cell> critical;
+
+    for (Cell cell = 0; cell <= complex.cellIdLimit(); ++cell)
+        if (complex.isCell(cell) and
+            field.isCritical(cell) and
+            complex.cellDimension(cell) <= dimension and
+            cellValue(cell, scalars, vertices) <= threshold
+            )
+            critical.push_back(cell);
+
+    std::stable_sort(critical.begin(), critical.end(),
+                     Comparator(complex, scalars));
+
+    return critical;
+}
+
+
 Labels pores(
     CubicalComplex const& complex,
     Scalars const& scalars,
@@ -42,16 +103,8 @@ Labels pores(
     Facets coI(complex.xdim(), complex.ydim(), complex.zdim(), true);
     Labels pores(complex, 0x7fffffff);
 
-    std::vector<Cell> sources;
-    for (Cell cell = 0; cell <= complex.cellIdLimit(); ++cell)
-    {
-        if (complex.isCell(cell)
-            and complex.cellDimension(cell) == 0
-            and field.isCritical(cell))
-        {
-            sources.push_back(cell);
-        }
-    }
+    std::vector<Cell> const sources =
+        criticalCellsSorted(complex, scalars, field, threshold, 0);
 
     for (size_t i = 0; i < sources.size(); ++i)
     {
