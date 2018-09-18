@@ -249,7 +249,7 @@ void compute(CubicalComplex const& complex, Distances & distances)
 }
 
 
-int main(const int argc, char* argv[])
+int run(const int argc, char* argv[])
 {
     namespace js = anu_am::json;
 
@@ -301,4 +301,30 @@ int main(const int argc, char* argv[])
         .fileAttributes(info.attributes())
         .datasetID(thisID)
         .description(description));
+
+    return 0;
+}
+
+
+int main(const int argc, char* argv[])
+{
+  try
+  {
+    run(argc, argv);
+  }
+  catch(std::runtime_error& e)
+  {
+    std::clog
+      << "terminate called after throwing an instance of "
+      << "'std::runtime_error'\n"
+      << "  what():  " << e.what() << '\n';
+    abort();
+  }
+  catch(std::exception& e)
+  {
+    std::clog
+      << "terminate called after throwing an exception\n"
+      << "  what():  " << e.what() << '\n';
+    abort();
+  }
 }
