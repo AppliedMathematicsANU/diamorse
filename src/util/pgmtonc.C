@@ -226,7 +226,7 @@ void usage(char *name)
 }
 
 
-int main(int argc, char* argv[])
+int run(int argc, char* argv[])
 {
     bool makeSegmentation = false;
     size_t threshold = 1;
@@ -284,4 +284,30 @@ int main(int argc, char* argv[])
         writeOutput<int8_t>(infile, outfile, images, instream, true, threshold);
     else
         writeOutput<float>(infile, outfile, images, instream);
+
+    return 0;
+}
+
+
+int main(const int argc, char* argv[])
+{
+  try
+  {
+    run(argc, argv);
+  }
+  catch(std::runtime_error& e)
+  {
+    std::clog
+      << "terminate called after throwing an instance of "
+      << "'std::runtime_error'\n"
+      << "  what():  " << e.what() << '\n';
+    abort();
+  }
+  catch(std::exception& e)
+  {
+    std::clog
+      << "terminate called after throwing an exception\n"
+      << "  what():  " << e.what() << '\n';
+    abort();
+  }
 }

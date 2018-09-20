@@ -122,7 +122,7 @@ Result checkAbsenceOfCancellableClosePairs(VolumeData const& candidate)
 }
 
 
-int main()
+int run()
 {
     report("the vector field is complete",
            checkWithSimplifiedVolumeData(
@@ -159,4 +159,30 @@ int main()
            checkWithSimplifiedVolumeData(checkAbsenceOfCancellableClosePairs));
 
     std::cerr << std::endl;
+
+    return 0;
+}
+
+
+int main()
+{
+  try
+  {
+    run();
+  }
+  catch(std::runtime_error& e)
+  {
+    std::clog
+      << "terminate called after throwing an instance of "
+      << "'std::runtime_error'\n"
+      << "  what():  " << e.what() << '\n';
+    abort();
+  }
+  catch(std::exception& e)
+  {
+    std::clog
+      << "terminate called after throwing an exception\n"
+      << "  what():  " << e.what() << '\n';
+    abort();
+  }
 }

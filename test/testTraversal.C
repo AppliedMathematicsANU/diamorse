@@ -387,7 +387,7 @@ Result checkConnections(VolumeData const& candidate)
 }
 
 
-int main()
+int run()
 {
     report("critical cells are in exactly their own stable or unstable sets",
            checkWithVolumeData(criticalCellsAreSelfLabelled));
@@ -414,4 +414,30 @@ int main()
            checkWithVolumeData(checkConnections));
 
     std::cerr << std::endl;
+
+    return 0;
+}
+
+
+int main()
+{
+  try
+  {
+    run();
+  }
+  catch(std::runtime_error& e)
+  {
+    std::clog
+      << "terminate called after throwing an instance of "
+      << "'std::runtime_error'\n"
+      << "  what():  " << e.what() << '\n';
+    abort();
+  }
+  catch(std::exception& e)
+  {
+    std::clog
+      << "terminate called after throwing an exception\n"
+      << "  what():  " << e.what() << '\n';
+    abort();
+  }
 }

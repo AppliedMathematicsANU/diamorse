@@ -223,9 +223,35 @@ Result checkPartition()
 }
 
 
-int main()
+int run()
 {
     report("partitions work properly", checkPartition<uint16_t>());
 
     std::cerr << std::endl;
+
+    return 0;
+}
+
+
+int main()
+{
+  try
+  {
+    run();
+  }
+  catch(std::runtime_error& e)
+  {
+    std::clog
+      << "terminate called after throwing an instance of "
+      << "'std::runtime_error'\n"
+      << "  what():  " << e.what() << '\n';
+    abort();
+  }
+  catch(std::exception& e)
+  {
+    std::clog
+      << "terminate called after throwing an exception\n"
+      << "  what():  " << e.what() << '\n';
+    abort();
+  }
 }

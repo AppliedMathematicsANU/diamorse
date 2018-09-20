@@ -94,7 +94,7 @@ Result containsNoCyclicVPathsAfterSaturation(VolumeData const& candidate)
 }
 
 
-int main()
+int run()
 {
     report("a passing property produces no errors",
            checkWithVolumeData(alwaysTrue));
@@ -131,4 +131,30 @@ int main()
            checkWithVolumeData(forAllCells(bind(vImageHasCompatibleValue, 0))));
 
     std::cerr << std::endl;
+
+    return 0;
+}
+
+
+int main()
+{
+  try
+  {
+    run();
+  }
+  catch(std::runtime_error& e)
+  {
+    std::clog
+      << "terminate called after throwing an instance of "
+      << "'std::runtime_error'\n"
+      << "  what():  " << e.what() << '\n';
+    abort();
+  }
+  catch(std::exception& e)
+  {
+    std::clog
+      << "terminate called after throwing an exception\n"
+      << "  what():  " << e.what() << '\n';
+    abort();
+  }
 }

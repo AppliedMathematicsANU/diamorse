@@ -156,7 +156,7 @@ SimpleComplex simpleChainComplex(
 }
 
 
-int main(int argc, char* argv[])
+int run(int argc, char* argv[])
 {
     namespace js = anu_am::json;
 
@@ -286,4 +286,30 @@ int main(int argc, char* argv[])
     ofs << "#" << std::endl
         << "#+ " << "history_"+thisID << std::endl;
     ofs << js::toString(description, 2, "#= ") << std::endl;
+
+    return 0;
+}
+
+
+int main(const int argc, char* argv[])
+{
+  try
+  {
+    run(argc, argv);
+  }
+  catch(std::runtime_error& e)
+  {
+    std::clog
+      << "terminate called after throwing an instance of "
+      << "'std::runtime_error'\n"
+      << "  what():  " << e.what() << '\n';
+    abort();
+  }
+  catch(std::exception& e)
+  {
+    std::clog
+      << "terminate called after throwing an exception\n"
+      << "  what():  " << e.what() << '\n';
+    abort();
+  }
 }
