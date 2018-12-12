@@ -15,7 +15,7 @@ endif
 CXXOPTS     = -std=c++11 -g -O3 $(CXXWARN)
 CXXFLAGS    = $(CXXOPTS) $(PYTHON_INCL) $(NUMPY_INCL) $(EXTRA_INCL)
 BINDIR      = ../../bin
-LDFLAGS     = -lpython${PYTHON_VERSION}
+LDFLAGS     = -L${PYTHON_PREFIX}/lib -lpython${PYTHON_VERSION}
 
 MAKEDEPEND  = $(CXX) $(CXXFLAGS) -MM -MP -MT $(BINDIR)/$*.so -o $*.P $<
 
