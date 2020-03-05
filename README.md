@@ -15,7 +15,7 @@ Below is some minimal information that should help you get started. We plan to a
 
 ## Installation
 
-In order to compile diamorse, you will need *git*, a GNU-compatible *make*, and a C++ compiler that supports the C++11 standard. Please contact us if any of these requirements poses a problem.
+In order to compile diamorse, you will need *git*, a GNU-compatible *make*, and a C++ compiler that supports the C++11 standard. Please contact us if any of these requirements poses a problem. The python scripts use python2.7. 
 
 * Clone this repository to your machine: `git clone https://github.com/AppliedMathematicsANU/diamorse.git`
 * Change into the newly created directory: `cd diamorse`
@@ -59,7 +59,7 @@ Once you have a greyscale image in NetCDF3 format you can generate the persisten
 
 * diamorse/python/persistence.py
 
-  Python wrapper for the vector field and persistence computations
+  Python2.7 wrapper for the vector field and persistence computations
   
   INPUT:	file.nc  (greyscale NetCDF image)
 
@@ -84,7 +84,7 @@ Once you have a greyscale image in NetCDF3 format you can generate the persisten
 
 * diamorse/python/plot_persistence.py
 
-  Python scripts to provide basic plots of persistence diagrams. 
+  Python2.7 scripts to provide basic plots of persistence diagrams. 
 
 
 * diamorse/python/plot_basins.py
