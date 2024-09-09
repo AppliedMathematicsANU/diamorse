@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
+from __future__ import print_function
 import sys
 from MorseAnalysis import VolumeImage, VectorField
-from __future__ import print_function
 
 infinity = float('inf')
 
