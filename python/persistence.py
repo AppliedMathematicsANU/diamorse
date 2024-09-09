@@ -2,7 +2,7 @@
 
 import sys
 from MorseAnalysis import VolumeImage, VectorField
-
+from __future__ import print_function
 
 infinity = float('inf')
 
@@ -143,8 +143,8 @@ def printStats(pairs):
         print ("# Numbers of cells of dimension " + str(d) +
                " by lower persistence thresholds")
         for x in sorted(counts.keys()):
-            print "%10.5f %6d" % (x, counts[x])
-        print
+            print ("%10.5f %6d" % (x, counts[x]))
+        print()
 
 
 if __name__ == '__main__':
@@ -185,7 +185,7 @@ if __name__ == '__main__':
 
     if options.betti:
         for i in range(len(xth)):
-            print "# The %f-persistent %s Betti numbers:" % (threshold, xth[i])
+            print ("# The %f-persistent %s Betti numbers:" % (threshold, xth[i]))
             for (val, count) in bettiNumbers(pairs, i, threshold):
-                print "%10.5f %6d" % (val, count)
-            print
+                print ("%10.5f %6d" % (val, count))
+            print()

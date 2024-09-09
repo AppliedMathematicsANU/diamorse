@@ -1,9 +1,9 @@
-PYTHON_PREFIX  = $(shell python -c "import sys; print sys.prefix")
+PYTHON_PREFIX  = $(shell python -c "import sys; print (sys.prefix)")
 PYTHON_VERSION = $(shell python -c "import sys;\
-print '%d.%d' % (sys.version_info.major, sys.version_info.minor)")
+print ('%d.%d' % (sys.version_info.major, sys.version_info.minor))")
 
 PYTHON_INCL = -I ${PYTHON_PREFIX}/include/python${PYTHON_VERSION}
-NUMPY_INCL  = -I $(shell python -c "import numpy; print numpy.get_include()")
+NUMPY_INCL  = -I $(shell python -c "import numpy; print (numpy.get_include())")
 EXTRA_INCL  = -I ../lib
 
 ifeq ($(CXX),c++)
