@@ -249,7 +249,7 @@ colors_by_name = {
 def parse_color(s):
     s = s.lower()
 
-    if colors_by_name.has_key(s):
+    if s in colors_by_name:
         return colors_by_name[s]
     else:
         if s.startswith('#'):
@@ -386,7 +386,7 @@ def parse_options():
 
 
 if __name__ == '__main__':
-    import sys, os.path
+    import sys
     from MorseAnalysis import VolumeImage, VectorField
 
     (options, args) = parse_options()
@@ -407,11 +407,11 @@ if __name__ == '__main__':
             'skeleton'  : morse.skeleton(),
             'paths'     : morse.paths(),
             'critical'  : critical,
-            'critval'   : map(img.scalarForCell, critical),
-            'critdim'   : map(img.cellDimension, critical)
+            'critval'   : list(map(img.scalarForCell, critical)),
+            'critdim'   : list(map(img.cellDimension, critical))
             }
     else:
-        raise RuntimeException('must have an NetCDF input file')
+        raise RuntimeError('must have an NetCDF input file')
 
     set_plot_defaults()
     plot(data, options)
