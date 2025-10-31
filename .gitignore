@@ -23,3 +23,6 @@ tmp/
 
 # Directory for binaries
 bin/
+
+# VSCode settings directory
+.vscode
