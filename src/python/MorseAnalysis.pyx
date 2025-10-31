@@ -55,8 +55,10 @@ cdef extern from "ImageAnalysis.hpp" namespace "anu_am::diamorse":
 cdef class VolumeImage:
     cdef ImageData[float] * _img
 
-    def __cinit__(self, string filename):
-        self._img = new ImageData[float](filename)
+    def __cinit__(self, str filename):
+        cdef bytes b_filename = filename.encode()
+        cdef char* c_filename = b_filename
+        self._img = new ImageData[float](c_filename)
  
     def __dealloc__(self):
         del self._img
@@ -100,11 +102,13 @@ cdef class VectorField:
     def __cinit__(self,
                   VolumeImage volume,
                   float threshold = -1,
-                  string filename = ''
+                  str filename = ''
                   ):
+        cdef bytes b_filename = filename.encode()
+        cdef char* c_filename = b_filename
         self._volume = volume
-        if filename.size() > 0:
-            self._morse = new MorseData[float](deref(volume._img), filename)
+        if len(filename) > 0:
+            self._morse = new MorseData[float](deref(volume._img), c_filename)
         else:
             self._morse = new MorseData[float](deref(volume._img), threshold)
 
