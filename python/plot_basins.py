@@ -409,15 +409,15 @@ if __name__ == '__main__':
     critical = list(morse.criticalCells())
 
     data = {
-        'scalars'   : img.data(),
+        'scalars'   : morse.img_data(),
         'directions': morse.data(),
         'basins'    : morse.basinMap(),
         'watersheds': morse.watersheds(),
         'skeleton'  : morse.skeleton(),
         'paths'     : morse.paths(),
         'critical'  : critical,
-        'critval'   : list(map(img.scalarForCell, critical)),
-        'critdim'   : list(map(img.cellDimension, critical))
+        'critval'   : list(map(morse.scalarForCell, critical)),
+        'critdim'   : list(map(morse.cellDimension, critical))
     }
 
     set_plot_defaults()

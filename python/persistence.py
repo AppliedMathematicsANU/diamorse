@@ -12,8 +12,8 @@ def fromVolumeFile(filename, options):
     img = VolumeImage(data)
     morse = VectorField(img, threshold = options.threshold)
 
-    dim = lambda v: img.cellDimension(v)
-    val = lambda v: img.scalarForCell(v) if v else infinity
+    dim = lambda v: morse.cellDimension(v)
+    val = lambda v: morse.scalarForCell(v) if v else infinity
 
     weights = dict((tuple(v), x) for v, x in morse.weights())
 

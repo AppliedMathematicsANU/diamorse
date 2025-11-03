@@ -127,6 +127,18 @@ cdef class VectorField:
     def __dealloc__(self):
         del self._morse
 
+    def img_data(self):
+        return self._volume.data()
+
+    def shape(self):
+        return self._volume().shape()
+
+    def cellDimension(self, vector[float] pos):
+        return self._volume.cellDimension(pos)
+
+    def scalarForCell(self, vector[float] pos):
+        return self._volume.scalarForCell(pos)
+
     def data(self):
         cdef int xdim = self._volume._img.xdim()
         cdef int ydim = self._volume._img.ydim()
