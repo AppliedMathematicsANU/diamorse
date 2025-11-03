@@ -49,6 +49,7 @@ class ImageData
 {
     typedef CubicalComplex::cell_id_type Cell;
     typedef VertexMap<CubicalComplex, Value> Scalars;
+    typedef std::shared_ptr<std::vector<Value> > DataPtr;
 
     std::vector<size_t> dims_;
     CubicalComplex complex_;
@@ -58,6 +59,13 @@ class ImageData
 
 public:
     ImageData();
+
+    ImageData(std::vector<Value> * data, std::vector<size_t> dims)
+        : dims_(dims),
+          complex_(dims_.at(0), dims_.at(1), dims_.at(2)),
+          scalars_(complex_, DataPtr(data))
+    {
+    }
 
     ImageData(std::string const filename)
         : dims_(readDimensions(filename)),

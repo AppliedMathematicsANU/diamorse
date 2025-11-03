@@ -1,17 +1,16 @@
 #!/usr/bin/env python
 
 import sys
-from MorseAnalysis import VolumeImage, VectorField
+from MorseAnalysis import read_netcdf, VolumeImage, VectorField
 
 
 infinity = float('inf')
 
 
 def fromVolumeFile(filename, options):
-    img = VolumeImage(filename)
-    morse = VectorField(img,
-                        threshold = options.threshold,
-                        filename = options.field)
+    data = read_netcdf(filename)
+    img = VolumeImage(data)
+    morse = VectorField(img, threshold = options.threshold)
 
     dim = lambda v: img.cellDimension(v)
     val = lambda v: img.scalarForCell(v) if v else infinity
@@ -152,10 +151,7 @@ if __name__ == '__main__':
     from collections import defaultdict
 
     parser = argparse.ArgumentParser("usage: %prog [OPTIONS] INFILE")
-    parser.add_argument('infile', help='file containing the field')
-    parser.add_argument('-f', '--field', dest = 'field', metavar = 'FILE',
-                      default = '',
-                      help = 'file containing a pre-computed vector field')
+    parser.add_argument('infile', help='file containing the input data')
     parser.add_argument('-t', '--threshold', dest = 'threshold', metavar = 'X',
                       type = float, default = 1.0,
                       help = 'simplification threshold (default 1.0)')

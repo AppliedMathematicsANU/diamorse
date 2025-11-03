@@ -12,6 +12,7 @@ from libc.stdint cimport uint8_t, uint32_t
 from libcpp.pair cimport pair
 from libcpp.string cimport string
 from libcpp.vector cimport vector
+from libcpp.memory cimport shared_ptr
 
 import numpy as np
 cimport numpy as np
@@ -27,6 +28,7 @@ cdef extern from "ImageAnalysis.hpp" namespace "anu_am::diamorse":
     cdef cppclass ImageData[V]:
         ImageData() except +
         ImageData(string) except +
+        ImageData(vector[float] *, vector[size_t]) except +
         int xdim() except +
         int ydim() except +
         int zdim() except +
@@ -52,13 +54,32 @@ cdef extern from "ImageAnalysis.hpp" namespace "anu_am::diamorse":
         vector[pair[size_t, int]] weights() except +
 
 
+cdef extern from "volume_io.hpp" namespace "anu_am::diamorse":
+    cdef vector[size_t] readDimensions(string)
+    cdef shared_ptr[vector[float]] readVolumeData[float](string)
+
+
 cdef class VolumeImage:
     cdef ImageData[float] * _img
 
-    def __cinit__(self, str filename):
-        cdef bytes b_filename = filename.encode()
-        cdef char* c_filename = b_filename
-        self._img = new ImageData[float](c_filename)
+    def __cinit__(self, np.ndarray[FLOAT32_t, ndim=3] data):
+        cdef int zdim = data.shape[0]
+        cdef int ydim = data.shape[1]
+        cdef int xdim = data.shape[2]
+
+        cdef vector[float] * c_data = new vector[float](xdim * ydim * zdim)
+        cdef float val
+
+        k = 0
+        for x in range(xdim):
+            for y in range(ydim):
+                for z in range(zdim):
+                    val = data[z, y, x]
+                    deref(c_data)[k] = val
+                    k += 1
+
+        cdef vector[size_t] dims = [xdim, ydim, zdim]
+        self._img = new ImageData[float](c_data, dims)
  
     def __dealloc__(self):
         del self._img
@@ -99,18 +120,9 @@ cdef class VectorField:
     cdef VolumeImage _volume
     cdef MorseData[float] * _morse
 
-    def __cinit__(self,
-                  VolumeImage volume,
-                  float threshold = -1,
-                  str filename = ''
-                  ):
-        cdef bytes b_filename = filename.encode()
-        cdef char* c_filename = b_filename
+    def __cinit__(self, VolumeImage volume, float threshold = -1):
         self._volume = volume
-        if len(filename) > 0:
-            self._morse = new MorseData[float](deref(volume._img), c_filename)
-        else:
-            self._morse = new MorseData[float](deref(volume._img), threshold)
+        self._morse = new MorseData[float](deref(volume._img), threshold)
 
     def __dealloc__(self):
         del self._morse
@@ -280,3 +292,25 @@ cdef class VectorField:
             a = img.positionForCell(p.first)
             v = p.second
             yield (a, v)
+
+
+def read_netcdf(str filename):
+    cdef bytes b_filename = filename.encode()
+    cdef char* c_filename = b_filename
+    cdef vector[size_t] dims = readDimensions(c_filename)
+    cdef shared_ptr[vector[float]] c_data = readVolumeData[float](c_filename)
+
+    cdef zdim = dims.at(0)
+    cdef ydim = dims.at(1)
+    cdef xdim = dims.at(2)
+
+    cdef np.ndarray[FLOAT32_t, ndim=3] out = np.zeros([xdim, ydim, zdim], dtype=FLOAT32)
+    k = 0
+
+    for z in range(zdim):
+        for y in range(ydim):
+            for x in range(xdim):
+                out[x, y, z] = deref(c_data)[k]
+                k += 1
+
+    return out

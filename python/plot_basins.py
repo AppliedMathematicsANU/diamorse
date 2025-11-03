@@ -315,9 +315,6 @@ def parse_options():
 
     parser = OptionParser("usage: %prog [OPTIONS] INFILE",
                           option_class = MyOption)
-    parser.add_option('-f', '--field', dest = 'field', metavar = 'FILE',
-                      default = '',
-                      help = 'file containing a pre-computed vector field')
     parser.add_option('-t', '--threshold', dest = 'threshold', metavar = 'X',
                       type = 'float', default = 1.0,
                       help = 'simplification threshold (default 1.0)')
@@ -386,32 +383,42 @@ def parse_options():
 
 
 if __name__ == '__main__':
+    import os
     import sys
-    from MorseAnalysis import VolumeImage, VectorField
+    import numpy as np
+    from MorseAnalysis import read_netcdf, VolumeImage, VectorField
 
     (options, args) = parse_options()
     infile = args[0]
-    
-    if infile.endswith('.nc'):
-        img = VolumeImage(infile)
-        morse = VectorField(img,
-                            threshold = options.threshold,
-                            filename = options.field)
-        critical = list(morse.criticalCells())
 
-        data = {
-            'scalars'   : img.data(),
-            'directions': morse.data(),
-            'basins'    : morse.basinMap(),
-            'watersheds': morse.watersheds(),
-            'skeleton'  : morse.skeleton(),
-            'paths'     : morse.paths(),
-            'critical'  : critical,
-            'critval'   : list(map(img.scalarForCell, critical)),
-            'critdim'   : list(map(img.cellDimension, critical))
-            }
+    extension = os.path.splitext(infile)[1]
+
+    if infile.endswith('.nc') or infile.endswith('_nc'):
+        data = read_netcdf(infile)
+        shape = data.shape
+
+        if shape[0] > 1:
+            z = shape[0] // 2
+            data = data[z: z+1, ...]
     else:
         raise RuntimeError('must have an NetCDF input file')
+
+    img = VolumeImage(data)
+    morse = VectorField(img, threshold=options.threshold)
+
+    critical = list(morse.criticalCells())
+
+    data = {
+        'scalars'   : img.data(),
+        'directions': morse.data(),
+        'basins'    : morse.basinMap(),
+        'watersheds': morse.watersheds(),
+        'skeleton'  : morse.skeleton(),
+        'paths'     : morse.paths(),
+        'critical'  : critical,
+        'critval'   : list(map(img.scalarForCell, critical)),
+        'critdim'   : list(map(img.cellDimension, critical))
+    }
 
     set_plot_defaults()
     plot(data, options)

@@ -74,15 +74,16 @@ ElementDataFile = %s
     output = scaled(data, 254, symmetric) if scale else data
 
     fp = open(raw_filename, 'wb')
-    fp.write('\0')
+    fp.write(b'\0')
     fp.write(struct.pack('<3i', *data.shape))
-    fp.write(output.astype('uint8').tostring())
+    fp.write(output.astype('uint8').tobytes())
     fp.close()
 
 
 def getProcessedMorseData(infile, threshold):
     if infile.endswith('.nc'):
-        img = VolumeImage(infile)
+        data = read_netcdf(infile)
+        img = VolumeImage(data)
         morse = VectorField(img, threshold)
         critical = list(morse.criticalCells())
 
@@ -93,8 +94,8 @@ def getProcessedMorseData(infile, threshold):
             'skeleton'  : morse.skeleton(),
             'paths'     : morse.paths(),
             'critical'  : critical,
-            'critval'   : map(img.scalarForCell, critical),
-            'critdim'   : map(img.cellDimension, critical)
+            'critval'   : list(map(img.scalarForCell, critical)),
+            'critdim'   : list(map(img.cellDimension, critical))
             }
 
         outfile = "%s.npz" % os.path.splitext(os.path.basename(infile))[0]
@@ -118,7 +119,7 @@ def shuffle(data):
 if __name__ == '__main__':
     import re, os.path
 
-    from MorseAnalysis import VolumeImage, VectorField
+    from MorseAnalysis import read_netcdf, VolumeImage, VectorField
 
     inf = float('inf')
 
@@ -133,7 +134,7 @@ if __name__ == '__main__':
 
     basename = re.sub('^tomo_float_', '',
                       os.path.splitext(os.path.basename(infile))[0])
-    
+
     scalars    = data['scalars']
     basins     = shuffle(data['basins'])
     pores      = np.where(scalars > 0, 254, basins)
@@ -151,7 +152,7 @@ if __name__ == '__main__':
         fname = os.path.join(path, "%s_%s" % (basename, suffix))
         ensure_dir(os.path.dirname(fname))
         write_as_mhd(data,
-                     re.sub('^\./', '', fname),
+                     re.sub('^\\./', '', fname),
                      scale = scale,
                      symmetric = symmetric)
 

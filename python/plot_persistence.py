@@ -3,7 +3,6 @@
 import sys
 import matplotlib.pyplot as plt
 import matplotlib.colors as col
-import numpy as np
 
 import persistence
 
@@ -51,14 +50,11 @@ def deathsVersusBirthsHistogram(pairs, dim, threshold, nbins=100):
 
 
 if __name__ == '__main__':
-    import sys, os.path
+    import sys
 
     import argparse
     parser = argparse.ArgumentParser(description='Process and plot.')
-    parser.add_argument('infile', help='file containing the field')
-    parser.add_argument('-f', '--field', metavar = 'FILE',
-                        default = '',
-                        help = 'file containing a pre-computed vector field')
+    parser.add_argument('infile', help='file containing the input data')
     parser.add_argument('-t', '--threshold', metavar = 'X',
                         type = float, default = 1.0,
                         help = 'simplification threshold (default 1.0)')
