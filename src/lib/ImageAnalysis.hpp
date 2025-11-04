@@ -610,6 +610,7 @@ public:
                             sources.at(i),
                             j >= n ? sources.at(i) : sources.at(j)));
             }
+            birthDeathPairsComputed_ = true;
         }
 
         return birthDeathPairs_;

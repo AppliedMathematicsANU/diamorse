@@ -40,19 +40,13 @@ class MorseVectorField(object):
 
 
     def births_and_deaths(self, dimension, threshold):
-        if not hasattr(self, "_births_and_deaths"):
-            dim = lambda v: self._morse.cellDimension(v)
-            val = lambda v: self._morse.scalarForCell(v) if v else _np.inf
-
-            self._births_and_deaths = tuple(
-                (val(v), val(w), dim(v))
-                for v, w in self._morse.birthsAndDeaths()
-            )
+        dim = lambda v: self._morse.cellDimension(v)
+        val = lambda v: self._morse.scalarForCell(v) if v else _np.inf
 
         return tuple(
-            (birth, death)
-            for birth, death, dim in self._births_and_deaths
-            if dim == dimension and death - birth > threshold
+            (val(v), val(w))
+            for v, w in self._morse.birthsAndDeaths()
+            if dim(v) == dimension and val(w) - val(v) > threshold
         )
 
 
