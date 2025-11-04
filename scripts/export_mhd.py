@@ -81,21 +81,17 @@ ElementDataFile = %s
 
 
 def getProcessedMorseData(infile, threshold):
+    from diamorse_py3 import MorseVectorField
+
     if infile.endswith('.nc'):
-        data = read_netcdf(infile)
-        img = VolumeImage(data)
-        morse = VectorField(img, threshold)
-        critical = list(morse.criticalCells())
+        morse = MorseVectorField(infile, threshold=threshold)
 
         data = {
-            'scalars'   : morse.img_data(),
-            'basins'    : morse.basinMap(),
-            'watersheds': morse.watersheds(),
+            'scalars'   : morse.scalars(),
+            'basins'    : morse.basin_labels(),
+            'watersheds': morse.on_watershed(),
             'skeleton'  : morse.skeleton(),
-            'paths'     : morse.paths(),
-            'critical'  : critical,
-            'critval'   : list(map(morse.scalarForCell, critical)),
-            'critdim'   : list(map(morse.cellDimension, critical))
+            'paths'     : morse.on_path(),
             }
 
         outfile = "%s.npz" % os.path.splitext(os.path.basename(infile))[0]
@@ -118,8 +114,6 @@ def shuffle(data):
 
 if __name__ == '__main__':
     import re, os.path
-
-    from .MorseAnalysis import read_netcdf, VolumeImage, VectorField
 
     inf = float('inf')
 
