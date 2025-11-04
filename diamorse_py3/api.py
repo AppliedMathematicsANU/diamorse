@@ -39,6 +39,25 @@ class MorseVectorField(object):
         return basins
 
 
+    def on_watershed(self):
+        return self._morse.watersheds()
+
+
+    def on_path(self):
+        return self._morse.paths()
+
+
+    def skeleton(self):
+        return self._morse.skeleton()
+
+
+    def critical_cells(self, dimension):
+        return tuple(
+            tuple(c) for c in self._morse.criticalCells()
+            if self._morse.cellDimension(c) == dimension
+        )
+
+
     def birth_death_pairs(self, dimension, threshold):
         dim = lambda v: self._morse.cellDimension(v)
         val = lambda v: self._morse.scalarForCell(v) if v else _np.inf
@@ -97,9 +116,13 @@ if __name__ == "__main__":
     print(f"Scalars:\n{mvf.scalars()}\n")
     print(f"Basin labels:\n{mvf.basin_labels()}\n")
     print(f"Pore labels:\n{mvf.pore_labels()}\n")
+    print(f"Watersheds:\n{mvf.on_watershed()}\n")
+    print(f"Paths:\n{mvf.on_path()}\n")
+    print(f"Skeleton:\n{mvf.skeleton()}\n")
 
     for dim in range(4):
         print(f"Dimension {dim}")
+        print(f"  Critical cells: {mvf.critical_cells(dim)}")
         print(f"  Birth-death pairs: {mvf.birth_death_pairs(dim, 0)}")
         print(f"  Births: {mvf.births(dim, 0)}")
         print(f"  Deaths: {mvf.deaths(dim, 0)}")
