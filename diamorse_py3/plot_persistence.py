@@ -1,10 +1,9 @@
 #!/usr/bin/env python
 
-import sys
 import matplotlib.pyplot as plt
 import matplotlib.colors as col
 
-import persistence
+from . import persistence
 
 
 infinity = float('inf')

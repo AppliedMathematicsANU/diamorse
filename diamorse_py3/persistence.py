@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import sys
-from MorseAnalysis import read_netcdf, VolumeImage, VectorField
+from .MorseAnalysis import read_netcdf, VolumeImage, VectorField
 
 
 infinity = float('inf')

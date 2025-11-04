@@ -1,9 +1,7 @@
 #!/usr/bin/env python
 
-import sys
 import pylab
 import matplotlib.pyplot as plt
-import matplotlib.colors as col
 import numpy as np
 
 from matplotlib.ticker import MultipleLocator, FormatStrFormatter
@@ -384,9 +382,8 @@ def parse_options():
 
 if __name__ == '__main__':
     import os
-    import sys
     import numpy as np
-    from MorseAnalysis import read_netcdf, VolumeImage, VectorField
+    from .MorseAnalysis import read_netcdf, VolumeImage, VectorField
 
     (options, args) = parse_options()
     infile = args[0]

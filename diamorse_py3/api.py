@@ -5,7 +5,7 @@ import numpy as _np
 
 class MorseVectorField(object):
     def __init__(self, source, threshold=-1.0):
-        from MorseAnalysis import read_netcdf, VolumeImage, VectorField
+        from .MorseAnalysis import read_netcdf, VolumeImage, VectorField
 
         if isinstance(source, str):
             data = read_netcdf(source)
@@ -39,7 +39,7 @@ class MorseVectorField(object):
         return basins
 
 
-    def births_and_deaths(self, dimension, threshold):
+    def birth_death_pairs(self, dimension, threshold):
         dim = lambda v: self._morse.cellDimension(v)
         val = lambda v: self._morse.scalarForCell(v) if v else _np.inf
 
@@ -52,13 +52,13 @@ class MorseVectorField(object):
 
     def births(self, dimension, threshold):
         return tuple(
-            birth for birth, _ in self.births_and_deaths(dimension, threshold)
+            birth for birth, _ in self.birth_death_pairs(dimension, threshold)
         )
 
 
     def deaths(self, dimension, threshold):
         return tuple(
-            death for _, death in self.births_and_deaths(dimension, threshold)
+            death for _, death in self.birth_death_pairs(dimension, threshold)
         )
 
 
@@ -100,7 +100,7 @@ if __name__ == "__main__":
 
     for dim in range(4):
         print(f"Dimension {dim}")
-        print(f"  Birth-death pairs: {mvf.births_and_deaths(dim, 0)}")
+        print(f"  Birth-death pairs: {mvf.birth_death_pairs(dim, 0)}")
         print(f"  Births: {mvf.births(dim, 0)}")
         print(f"  Deaths: {mvf.deaths(dim, 0)}")
         print(f"  Betti numbers: {mvf.betti_numbers(dim, 0)}")

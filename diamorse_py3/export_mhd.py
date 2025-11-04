@@ -119,7 +119,7 @@ def shuffle(data):
 if __name__ == '__main__':
     import re, os.path
 
-    from MorseAnalysis import read_netcdf, VolumeImage, VectorField
+    from .MorseAnalysis import read_netcdf, VolumeImage, VectorField
 
     inf = float('inf')
 
