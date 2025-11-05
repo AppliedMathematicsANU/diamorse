@@ -4,7 +4,7 @@ import dataclasses as _dc
 import numpy as _np
 
 
-@_dc.dataclass
+@_dc.dataclass(frozen=True)
 class Cell:
     position: tuple[float, float, float]
     dimension: int
