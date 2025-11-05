@@ -136,22 +136,26 @@ def plot(data, options):
                                  True, False),
                         options.skeleton_color, options.skeleton_alpha)
 
-    basins = split(shuffle(data['basins'][z],
-                           data['critical'] if options.stable_colors else None))
+    critical = [c.position for c in data['critical']]
+    critdim = [c.dimension for c in data['critical']]
+
+    basins = split(shuffle(
+        data['basins'][z],
+        critical if options.stable_colors else None
+    ))
     basins[:,:,3] = options.basins_alpha * 0xff
 
     pores = basins.copy()
     pores[:,:,3] = np.where(scalars > options.watermark,
                             0, options.pores_alpha * 0xff)
 
-    tmp = data['critical']
-    idx = list(i for i in range(len(tmp)) if tmp[i][2] == z)
-    critical = list(tmp[i][:2] for i in idx)
-    critdim = list(data['critdim'][i] for i in idx)
+    idx = [i for i in range(len(critical)) if critical[i][2] == z]
+    critical = [critical[i][:2] for i in idx]
+    critdim = [critdim[i] for i in idx]
 
-    fig, ax = plt.subplots(figsize =
-                           tuple(float(n) / DPI
-                                 for n in (options.width, options.height)))
+    fig, ax = plt.subplots(
+        figsize=tuple(float(n) / DPI for n in (options.width, options.height))
+    )
 
     img = np.zeros(basins.shape, np.uint8) + 0xff
 
@@ -381,40 +385,19 @@ def parse_options():
 
 
 if __name__ == '__main__':
-    import os
-    import numpy as np
-    from .MorseAnalysis import read_netcdf, VolumeImage, VectorField
+    from diamorse_py3 import MorseVectorField
 
     (options, args) = parse_options()
-    infile = args[0]
-
-    extension = os.path.splitext(infile)[1]
-
-    if infile.endswith('.nc') or infile.endswith('_nc'):
-        data = read_netcdf(infile)
-        shape = data.shape
-
-        if shape[0] > 1:
-            z = shape[0] // 2
-            data = data[z: z+1, ...]
-    else:
-        raise RuntimeError('must have an NetCDF input file')
-
-    img = VolumeImage(data)
-    morse = VectorField(img, threshold=options.threshold)
-
-    critical = list(morse.criticalCells())
+    morse = MorseVectorField(args[0], threshold=options.threshold)
 
     data = {
-        'scalars'   : morse.img_data(),
-        'directions': morse.data(),
-        'basins'    : morse.basinMap(),
-        'watersheds': morse.watersheds(),
+        'scalars'   : morse.scalars(),
+        'directions': morse.vector_field(),
+        'basins'    : morse.basin_labels(),
+        'watersheds': morse.on_watershed(),
         'skeleton'  : morse.skeleton(),
-        'paths'     : morse.paths(),
-        'critical'  : critical,
-        'critval'   : list(map(morse.scalarForCell, critical)),
-        'critdim'   : list(map(morse.cellDimension, critical))
+        'paths'     : morse.on_path(),
+        'critical'  : morse.critical_cells(),
     }
 
     set_plot_defaults()
