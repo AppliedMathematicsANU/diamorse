@@ -36,6 +36,10 @@ class MorseVectorField(object):
         return self._morse.img_data()
 
 
+    def vector_field(self):
+        return self._morse.data()
+
+
     def basin_labels(self):
         return self._morse.basinMap().astype(_np.int32)
 
