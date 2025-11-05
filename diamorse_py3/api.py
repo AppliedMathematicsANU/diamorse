@@ -121,16 +121,22 @@ class MorseVectorField(object):
         result = []
 
         if events:
-            (x, n, n0) = (events[0][0], 0, -1)
-            for (y, m) in events:
-                if y != x:
-                    if n != n0:
-                        result.append((x, n))
-                        n0 = n
-                    x = y
-                n += m
-            if n != n0:
-                result.append((x, n))
+            last_value = events[0][0]
+            last_count = -1
+            count = 0
+
+            for value, increment in events:
+                if value != last_value:
+                    if count != last_count:
+                        result.append((last_value, count))
+                        last_count = count
+
+                    last_value = value
+
+                count += increment
+
+            if count != last_count:
+                result.append((last_value, count))
 
         return tuple(result)
 
