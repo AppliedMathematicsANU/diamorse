@@ -81,7 +81,7 @@ ElementDataFile = %s
 
 
 def getProcessedMorseData(infile, threshold):
-    from diamorse_py3 import MorseVectorField
+    from diamorse import MorseVectorField
 
     if infile.endswith('.nc'):
         morse = MorseVectorField(infile, threshold=threshold)

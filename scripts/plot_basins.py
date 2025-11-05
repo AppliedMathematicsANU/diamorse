@@ -385,7 +385,7 @@ def parse_options():
 
 
 if __name__ == '__main__':
-    from diamorse_py3 import MorseVectorField
+    from diamorse import MorseVectorField
 
     (options, args) = parse_options()
     morse = MorseVectorField(args[0], threshold=options.threshold)
