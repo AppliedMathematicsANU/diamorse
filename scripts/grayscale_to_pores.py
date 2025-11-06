@@ -57,4 +57,4 @@ if __name__ == "__main__":
 
     outname = f"{barename(args.inputfile)}_pores"
     outputfile = args.outputfile or f"{outname}.nc"
-    write_netcdf(outputfile, outname, output.astype(_np.float32))
+    write_netcdf(outputfile, outname, output)

@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 
+"""The diamorse module."""
+
 import dataclasses as _dc
+import typing as _tp
 import numpy as _np
 
 # Import both of these here to make them available on the package level
@@ -9,19 +12,35 @@ from .MorseAnalysis import read_netcdf, write_netcdf
 
 @_dc.dataclass(frozen=True)
 class Cell:
+    """
+Represents a cell in a Morse vector field based on a cubical complex.
+Cells of dimension 0 (vertices) have integer coordinates and represent voxels.
+Cells of dimensions 1 through 3 are specified by their central coordinates.
+The value field contains the associated scalar value from the input volume data.
+    """
     position: tuple[float, float, float]
     dimension: int
     value: float
     weight: int
 
 
+FloatVolume: _tp.TypeAlias = _np.ndarray[tuple[int, int, int], _np.dtype[_np.float32]]
+ByteVolume: _tp.TypeAlias = _np.ndarray[tuple[int, int, int], _np.dtype[_np.uint8]]
+
+
 class MorseVectorField(object):
-    def __init__(self, source, threshold=-1.0):
+    """A Morse vector field."""
+
+    def __init__(
+        self,
+        source: str | FloatVolume,
+        threshold: float =-1.0
+    ):
         from .MorseAnalysis import VolumeImage, VectorField
 
         if isinstance(source, str):
             data = read_netcdf(source)
-            self._inputfile = source
+            self._inputfile: str | None = source
         elif isinstance(source, _np.ndarray):
             data = source
             self._inputfile = None
@@ -35,19 +54,19 @@ class MorseVectorField(object):
         self._threshold = threshold
 
 
-    def scalars(self):
+    def scalars(self) -> FloatVolume:
         return self._morse.img_data()
 
 
-    def vector_field(self):
+    def vector_field(self) -> ByteVolume:
         return self._morse.data()
 
 
-    def basin_labels(self):
-        return self._morse.basinMap().astype(_np.int32)
+    def basin_labels(self) -> FloatVolume:
+        return self._morse.basinMap()
 
 
-    def pore_labels(self, watermark=0.0):
+    def pore_labels(self, watermark=0.0) -> FloatVolume:
         scalars = self.scalars()
         basins = self.basin_labels()
         basins[scalars > watermark] = 0
@@ -55,28 +74,29 @@ class MorseVectorField(object):
         return basins
 
 
-    def on_watershed(self):
+    def on_watershed(self) -> ByteVolume:
         return self._morse.watersheds()
 
 
-    def on_path(self):
+    def on_path(self) -> ByteVolume:
         return self._morse.paths()
 
 
-    def skeleton(self):
+    def skeleton(self) -> FloatVolume:
         return self._morse.skeleton()
 
 
     def _make_cell(self, pos, weights):
-        if pos is None:
-            return None
-        else:
-            return Cell(
-                position=tuple(pos),
-                dimension=self._morse.cellDimension(pos),
-                value=self._morse.scalarForCell(pos),
-                weight=weights.get(tuple(pos), 0),
-            )
+        return Cell(
+            position=tuple(pos),
+            dimension=self._morse.cellDimension(pos),
+            value=self._morse.scalarForCell(pos),
+            weight=weights.get(tuple(pos), 0),
+        )
+
+
+    def _maybe_make_cell(self, pos, weights):
+        return None if pos is None else self._make_cell(pos, weights)
 
 
     def critical_cells(self):
@@ -88,11 +108,11 @@ class MorseVectorField(object):
         )
 
 
-    def birth_death_pairs(self):
+    def birth_death_pairs(self) -> tuple[tuple[Cell, Cell | None], ...]:
         weights = dict((tuple(v), x) for v, x in self._morse.weights())
 
         return tuple(
-            (self._make_cell(v, weights), self._make_cell(w, weights))
+            (self._make_cell(v, weights), self._maybe_make_cell(w, weights))
             for v, w in self._morse.birthsAndDeaths()
         )
 
