@@ -3,6 +3,9 @@
 import dataclasses as _dc
 import numpy as _np
 
+# Import both of these here to make them available on the package level
+from .MorseAnalysis import read_netcdf, write_netcdf
+
 
 @_dc.dataclass(frozen=True)
 class Cell:
@@ -14,7 +17,7 @@ class Cell:
 
 class MorseVectorField(object):
     def __init__(self, source, threshold=-1.0):
-        from .MorseAnalysis import read_netcdf, VolumeImage, VectorField
+        from .MorseAnalysis import VolumeImage, VectorField
 
         if isinstance(source, str):
             data = read_netcdf(source)

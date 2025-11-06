@@ -57,6 +57,14 @@ cdef extern from "ImageAnalysis.hpp" namespace "anu_am::diamorse":
 cdef extern from "volume_io.hpp" namespace "anu_am::diamorse":
     cdef vector[size_t] readDimensions(string)
     cdef shared_ptr[vector[float]] readVolumeData[float](string)
+    cdef void writeVolumeData[float](
+        shared_ptr[vector[float]],
+        string path,
+        string varname,
+        size_t xdim,
+        size_t ydim,
+        size_t zdim,
+    )
 
 
 cdef class VolumeImage:
@@ -326,3 +334,29 @@ def read_netcdf(str filename):
                 k += 1
 
     return out
+
+
+def write_netcdf(str filename, str varname, np.ndarray[FLOAT32_t, ndim=3] data):
+    cdef bytes b_filename = filename.encode()
+    cdef char* c_filename = b_filename
+    cdef bytes b_varname = varname.encode()
+    cdef char* c_varname = b_varname
+
+    cdef int zdim = data.shape[0]
+    cdef int ydim = data.shape[1]
+    cdef int xdim = data.shape[2]
+
+    cdef vector[float] * c_data = new vector[float](xdim * ydim * zdim)
+    cdef float val
+
+    k = 0
+    for z in range(zdim):
+        for y in range(ydim):
+            for x in range(xdim):
+                val = data[z, y, x]
+                deref(c_data)[k] = val
+                k += 1
+
+    writeVolumeData[float](
+        shared_ptr[vector[float]](c_data), c_filename, c_varname, xdim, ydim, zdim
+    )
