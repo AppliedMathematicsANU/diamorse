@@ -22,6 +22,8 @@ In order to compile diamorse, you will need *git*, a GNU-compatible *make*, and 
 * Run `make main` to compile only the main analysis programs, or `make` to also compile some utility programs.
 * Run `make python` to compile the python wrappers (optional, requires *cython* and *numpy*). Some of the Python scripts provided require *matplotlib*.
 
+!!! CAUTION: Python wrappers are out of date. !!!
+
 We have installed and run the code successfully under Linux and OS X, and expect that it will work out of the box on most Unix/Posix compatible systems. It is also possible to use diamorse under Windows via *Cygwin* (see the file [cygwin.md](https://github.com/AppliedMathematicsANU/diamorse/blob/master/cygwin.md) for details).
 
 ## File formats
@@ -56,6 +58,8 @@ All diamorse programs use the NetCDF3 file format for input and output of image 
 ## Usage
 
 Once you have a greyscale image in NetCDF3 format you can generate the persistence pairs, Morse skeleton and basins using the following. 
+
+CAUTION: Python scripts are out of date.
 
 * diamorse/python/persistence.py
 
@@ -94,18 +98,40 @@ Once you have a greyscale image in NetCDF3 format you can generate the persisten
   USAGE: `diamorse $ ./python/plot_basins -h` will display the full list of options. 
 
 
+The following commandline executable programs provide lower level functionality for 3d images.  These compute the Morse vector field from a NetCDF image, simplify it to a desired threshold, compute persistence pairs, output the Morse Skeleton and pore labels as NetCDF files for visualisation. 
 
-* diamorse/bin/VectorField 
+NOTE: 3D visualisation is not currently provided as part of diamorse.  
 
-* diamorse/bin/Simplify 
+* `diamorse $ ./bin/VectorField tomo_float_input.nc [OUTPUT]`
 
-* diamorse/bin/Skeleton
+  OUTPUT defaults to vector_field_input_GVF.nc
 
-* diamorse/bin/Pores
+* `diamorse $ ./bin/Simplify tomo_float_input.nc vector_field_input_GVF.nc [OUTPUT]`
 
-  The above programs provide lower level functionality for 3d images.  These compute the Morse vector field from a NetCDF image, simplify it to a desired threshold, output the Morse Skeleton and pore labels as NetCDF files for visualisation. 
+  OUTPUT defaults to vector_field_input_GVF_SMP.nc
 
-  3D visualisation is not currently provided as part of diamorse.  
+  OPTION: -p <float> (default = 1.0) persistence limit for feature cancellation
+  
+  OPTION: -s <float> size limit for feature cancellation
+  
+  OPTION: -t <float> value of a level threshold to preserve
+
+* `diamorse $ ./bin/PersistencePairs tomo_float_input.nc vector_field_input_GVF_SMP.nc [OUTPUT]`
+
+  OUTPUT defaults to persistence_input_GVF_SMP_PP.txt
+
+* `diamorse $ ./bin/Skeleton tomo_float_input.nc vector_field_input_GVF_SMP.nc [OUTPUT]`
+
+  OUTPUT defaults to segmented_input_GVF_SMP_SKL.nc
+
+  OPTION: -t <float> (default = 0.0) level set threshold 
+
+* `diamorse $ ./bin/Pores tomo_float_input.nc vector_field_input_GVF_SMP.nc [OUTPUT]`
+
+  OUTPUT defaults to labels_input_GVF_SMP_POR.nc
+
+  OPTION: -t <float> (default = 0.0) level set threshold 
+  
 
 
 # License
