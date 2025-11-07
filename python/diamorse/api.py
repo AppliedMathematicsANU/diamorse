@@ -3,7 +3,6 @@
 """The diamorse module."""
 
 import dataclasses as _dc
-import typing as _tp
 import numpy as _np
 
 # Import both of these here to make them available on the package level
@@ -24,8 +23,8 @@ The value field contains the associated scalar value from the input volume data.
     weight: int
 
 
-FloatVolume: _tp.TypeAlias = _np.ndarray[tuple[int, int, int], _np.dtype[_np.float32]]
-ByteVolume: _tp.TypeAlias = _np.ndarray[tuple[int, int, int], _np.dtype[_np.uint8]]
+FloatVolume = _np.ndarray[tuple[int, int, int], _np.dtype[_np.float32]]
+ByteVolume = _np.ndarray[tuple[int, int, int], _np.dtype[_np.uint8]]
 
 
 class MorseVectorField(object):
@@ -66,7 +65,7 @@ class MorseVectorField(object):
         return self._morse.basinMap()
 
 
-    def pore_labels(self, watermark=0.0) -> FloatVolume:
+    def pore_labels(self, watermark: float = 0.0) -> FloatVolume:
         scalars = self.scalars()
         basins = self.basin_labels()
         basins[scalars > watermark] = 0
@@ -86,7 +85,7 @@ class MorseVectorField(object):
         return self._morse.skeleton()
 
 
-    def _make_cell(self, pos, weights):
+    def _make_cell(self, pos, weights) -> Cell:
         return Cell(
             position=tuple(pos),
             dimension=self._morse.cellDimension(pos),
@@ -95,11 +94,11 @@ class MorseVectorField(object):
         )
 
 
-    def _maybe_make_cell(self, pos, weights):
+    def _maybe_make_cell(self, pos, weights) -> Cell | None:
         return None if pos is None else self._make_cell(pos, weights)
 
 
-    def critical_cells(self):
+    def critical_cells(self) -> tuple[Cell, ...]:
         weights = dict((tuple(v), x) for v, x in self._morse.weights())
 
         return tuple(
@@ -117,8 +116,8 @@ class MorseVectorField(object):
         )
 
 
-    def births(self, dimension, threshold=-1):
-        return sorted(tuple(
+    def births(self, dimension: int, threshold: float = -1.0) -> tuple[float, ...]:
+        return tuple(sorted(
             birth.value for birth, death in self.birth_death_pairs()
             if (
                 birth.dimension == dimension
@@ -128,8 +127,8 @@ class MorseVectorField(object):
         ))
 
 
-    def deaths(self, dimension, threshold=-1):
-        return sorted(tuple(
+    def deaths(self, dimension: int, threshold: float = -1.0) -> tuple[float, ...]:
+        return tuple(sorted(
             (_np.inf if death is None else death.value)
             for birth, death in self.birth_death_pairs()
             if (
@@ -140,7 +139,10 @@ class MorseVectorField(object):
         ))
 
 
-    def betti_numbers(self, dim, threshold=-1):
+    def betti_numbers(
+        self, dim: int, threshold: float = -1.0
+    ) -> tuple[tuple[float, int], ...]:
+
         births = tuple((birth,  1) for birth in self.births(dim, threshold))
         deaths = tuple((death, -1) for death in self.deaths(dim, threshold))
         events = sorted(births + deaths)
