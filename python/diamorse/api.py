@@ -7,10 +7,10 @@ The api module defines a class MorseVectorField which is intitialized with
 a 3-dimensional floating point Numpy array or the path to a NetCDF file.
 
 Relevant information can then be extracted by calling the various instance
-methods. Results that are expensive to compute are cached by the underlying
-library, but each method call returns a fresh copy of the cached data. If
-memory efficiency is a high priority, using the C++ library directly may be
-preferrable.
+methods. Results that are expensive to compute are computed once and then
+stored by the underlying library, but each method call returns a fresh copy
+of the stored data. If memory efficiency is a high priority, using the C++
+library directly may be preferrable.
 
 The underlying low-level bindings can be found in the MorseAnalysis module.
 """
@@ -28,7 +28,8 @@ class Cell:
 Represents a cell in a Morse vector field based on a cubical complex.
 Cells of dimension 0 (vertices) have integer coordinates and represent voxels.
 Cells of dimensions 1 through 3 are specified by their central coordinates.
-The value field contains the associated scalar value from the input volume data.
+The value field contains the associated scalar value from the input volume
+data.
     """
     position: tuple[float, float, float]
     dimension: int
@@ -41,7 +42,11 @@ ByteVolume = _np.ndarray[tuple[int, int, int], _np.dtype[_np.uint8]]
 
 
 class MorseVectorField(object):
-    """A Morse vector field."""
+    """
+A class that represents a discrete Morse vector field defined on a cubical
+complex based on a grayscale volume image and implements various operations on
+it.
+    """
 
     def __init__(
         self,
