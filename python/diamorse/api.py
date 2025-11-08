@@ -1,6 +1,19 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
-"""The diamorse module."""
+"""
+A high-level Python 3 API for the diamorse C++ library.
+
+The api module defines a class MorseVectorField which is intitialized with
+a 3-dimensional floating point Numpy array or the path to a NetCDF file.
+
+Relevant information can then be extracted by calling the various instance
+methods. Results that are expensive to compute are cached by the underlying
+library, but each method call returns a fresh copy of the cached data. If
+memory efficiency is a high priority, using the C++ library directly may be
+preferrable.
+
+The underlying low-level bindings can be found in the MorseAnalysis module.
+"""
 
 import dataclasses as _dc
 import numpy as _np
