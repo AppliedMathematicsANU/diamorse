@@ -25,11 +25,11 @@ from .MorseAnalysis import read_netcdf, write_netcdf
 @_dc.dataclass(frozen=True)
 class Cell:
     """
-Represents a cell in a Morse vector field based on a cubical complex.
-Cells of dimension 0 (vertices) have integer coordinates and represent voxels.
-Cells of dimensions 1 through 3 are specified by their central coordinates.
-The value field contains the associated scalar value from the input volume
-data.
+    Represents a cell in a Morse vector field based on a cubical complex.
+    Cells of dimension 0 (vertices) have integer coordinates and represent
+    voxels. Cells of dimensions 1 through 3 are specified by their central
+    coordinates. The value field contains the associated scalar value from
+    the input volume data.
     """
     position: tuple[float, float, float]
     dimension: int
@@ -43,16 +43,26 @@ ByteVolume = _np.ndarray[tuple[int, int, int], _np.dtype[_np.uint8]]
 
 class MorseVectorField(object):
     """
-A class that represents a discrete Morse vector field defined on a cubical
-complex based on a grayscale volume image and implements various operations on
-it.
+    A class that represents a discrete Morse vector field defined on a cubical
+    complex based on a grayscale volume image and implements various operations
+    on it.
     """
 
     def __init__(
         self,
         source: str | FloatVolume,
-        threshold: float =-1.0
+        threshold: float = -1.0
     ):
+        """
+        Takes a 3-dimensional floating point volume from either a Numpy array
+        or a NetCDF file, computes the associated Morse vector field and
+        optionally simplifies it.
+
+        A non-negative threshold parameter determines the maximal value
+        difference between critical cell pairs that can be merged during the
+        simplification.
+        """
+
         from .MorseAnalysis import VolumeImage, VectorField
 
         if isinstance(source, str):
