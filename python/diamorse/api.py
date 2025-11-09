@@ -38,6 +38,7 @@ class Cell:
 
 
 FloatVolume = _np.ndarray[tuple[int, int, int], _np.dtype[_np.float32]]
+LabelVolume = _np.ndarray[tuple[int, int, int], _np.dtype[_np.int32]]
 ByteVolume = _np.ndarray[tuple[int, int, int], _np.dtype[_np.uint8]]
 
 
@@ -82,18 +83,23 @@ class MorseVectorField(object):
 
 
     def scalars(self) -> FloatVolume:
+        "Returns a copy of the original grayscale data as a Numpy array."
         return self._morse.img_data()
 
 
     def vector_field(self) -> ByteVolume:
+        """
+        Returns a representation of the actual Morse vector field. This is
+        mostly for debugging and visualization of the underlying computations.
+        """
         return self._morse.data()
 
 
-    def basin_labels(self) -> FloatVolume:
-        return self._morse.basinMap()
+    def basin_labels(self) -> LabelVolume:
+        return self._morse.basinMap().astype(_np.int32)
 
 
-    def pore_labels(self, watermark: float = 0.0) -> FloatVolume:
+    def pore_labels(self, watermark: float = 0.0) -> LabelVolume:
         scalars = self.scalars()
         basins = self.basin_labels()
         basins[scalars > watermark] = 0
